@@ -18,13 +18,13 @@ class BikeProcessor:
         """
         Initialize with a list of raw trip dicts.
         """
-        pass
+        self.trips = trips
 
     def total_count(self) -> int:
         """
         Return the total number of trips including invalid ones.
         """
-        pass
+        return len(self.trips)
 
     def get_duration_sec(self, trip: dict) -> float:
         """
@@ -32,7 +32,10 @@ class BikeProcessor:
         Duration = ended_at - started_at.
         Timestamps are strings in format "YYYY-MM-DD HH:MM:SS".
         """
-        pass
+        fmt = "%Y-%m-%d %H:%M:%S"
+        start = datetime.strptime(trip["started_at"], fmt)
+        end = datetime.strptime(trip["ended_at"], fmt)
+        return (end - start).total_seconds()
 
     def get_valid_trips(self) -> list:
         """
@@ -43,7 +46,20 @@ class BikeProcessor:
             - end_station_id is empty string or None
             - ride_id is a duplicate (keep first occurrence only)
         """
-        pass
+        seen_ids = set()
+        valid = []
+        for t in self.trips:
+            if t["ride_id"] in seen_ids:
+                continue
+            seen_ids.add(t["ride_id"])
+            if self.get_duration_sec(t) <= 0:
+                continue
+            if not t["start_station_id"]:
+                continue
+            if not t["end_station_id"]:
+                continue
+            valid.append(t)
+        return valid
 
     def get_average_duration(self) -> float:
         """
@@ -51,7 +67,7 @@ class BikeProcessor:
         Round to 2 decimal places.
         Return 0.0 if there are no valid trips.
         """
-        pass
+        return round(sum(self.get_duration_sec(t) for t in self.get_valid_trips()) / max(len(self.get_valid_trips()), 1), 2)
 
     def get_count_by_user_type(self) -> dict:
         """
@@ -59,7 +75,16 @@ class BikeProcessor:
         Example: {"member": 10, "casual": 5}
         Only include user types that appear in valid trips.
         """
-        pass
+        val = dict()
+
+        for t in self.trips:
+
+            if t["member_casual"] not in val and t in self.get_valid_trips():
+                val[t["member_casual"]] = 0
+            if t in self.get_valid_trips():
+                val[t["member_casual"]] += 1
+        return val
+
 
     def get_top_start_stations(self, n: int) -> list:
         """
@@ -69,4 +94,11 @@ class BikeProcessor:
         If two stations have the same count, sort alphabetically ascending.
         Return station IDs only (not counts).
         """
-        pass
+        result = dict()
+        for t in self.trips:
+            if t in self.get_valid_trips():
+                if t["start_station_id"] not in result:
+                    result[t["start_station_id"]] = 0
+                result[t["start_station_id"]] += 1
+        sorted_result = sorted(result.items(), key=lambda x: (-x[1], x[0]))
+        return [x[0] for x in sorted_result[:n]]    
