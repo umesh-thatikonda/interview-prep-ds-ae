@@ -1,0 +1,499 @@
+[
+  {
+    "id": "py-1",
+    "title": "Average Rating per Content (Streaming)",
+    "difficulty": "Easy",
+    "statement": "Given a stream of user ratings as a list of tuples of the form `(user_id, content_name, genre, rating)`, calculate the average rating for each `content_name`. Return a dictionary mapping `content_name` to its average rating.",
+    "type": "python",
+    "initialCode": "# Write your solution here\n\n",
+    "testInput": "stream = [\n    (1001, \"The Office\", \"Comedy\", 3.0),\n    (1002, \"The Godfather\", \"Drama\", 4.0),\n    (1003, \"The Notebook\", \"Romance\", 5.0),\n    (1043, \"Her\", \"Sci-Fi\", 3.0),\n    (1004, \"Interstellar\", \"Sci-Fi\", 2.0),\n    (1011, \"Breaking Bad\", \"Drama\", 4.0),\n    (1032, \"Interstellar\", \"Sci-Fi\", 3.0),\n    (1124, \"Big Bang Theory\", \"Comedy\", 1.0),\n    (1011, \"The Godfather\", \"Drama\", 3.0),\n    (1052, \"Interstellar\", \"Sci-Fi\", 3.0),\n    (1226, \"Big Bang Theory\", \"Comedy\", 5.0),\n    (2164, \"The Martian\", \"Sci-Fi\", 4.0),\n    (2451, \"Back To The Future\", \"Sci-Fi\", 4.0),\n]",
+    "expectedOutput": "```python\n{'The Office': 3.0, 'The Godfather': 3.5, 'The Notebook': 5.0, 'Her': 3.0,\n 'Interstellar': 2.666..., 'Breaking Bad': 4.0, 'Big Bang Theory': 3.0,\n 'The Martian': 4.0, 'Back To The Future': 4.0}\n```"
+  },
+  {
+    "id": "py-2",
+    "title": "Top 2 Videos per Genre (Merge Two Datasets)",
+    "difficulty": "Medium",
+    "statement": "Merge two datasets using the `title` key. Group the merged videos by `genre`. For each genre, identify the top 2 videos with the highest `rating`. Print a formatted line per genre.",
+    "type": "python",
+    "initialCode": "# Write your solution here\n\n",
+    "testInput": "video_ratings_lengths = [\n    {\"title\": \"Ultimate Guide to Digital Marketing\", \"rating\": 4.5, \"video_length_mins\": 50},\n    {\"title\": \"Investing 101 Crash Course\", \"rating\": 4.8, \"video_length_mins\": 70},\n    {\"title\": \"2023 Crash Course\", \"rating\": 4.2, \"video_length_mins\": 35},\n    {\"title\": \"React Crash Course\", \"rating\": 4.7, \"video_length_mins\": 45},\n    {\"title\": \"Rust Crash Course\", \"rating\": 4.9, \"video_length_mins\": 60},\n    {\"title\": \"Weekly Yoga Routine for Beginners\", \"rating\": 4.3, \"video_length_mins\": 25},\n    {\"title\": \"10-Minute Meditation for Stress Reller\", \"rating\": 4.1, \"video_length_mins\": 10},\n    {\"title\": \"Standup Comedy Special\", \"rating\": 4.9, \"video_length_mins\": 60},\n    {\"title\": \"Funny Animal Fails Compilation\", \"rating\": 4.6, \"video_length_mins\": 15},\n    {\"title\": \"How to Make Your Friends Laugh\", \"rating\": 4.2, \"video_length_mins\": 6},\n]\n\nvideo_genres_watch = [\n    {\"title\": \"Ultimate Guide to Digital Marketing\", \"genre\": \"Business\", \"watch_duration_mins\": 45},\n    {\"title\": \"Investing 101 Crash Course\", \"genre\": \"Business\", \"watch_duration_mins\": 50},\n    {\"title\": \"2023 Crash Course\", \"genre\": \"Business\", \"watch_duration_mins\": 40},\n    {\"title\": \"React Crash Course\", \"genre\": \"Tech\", \"watch_duration_mins\": 50},\n    {\"title\": \"Rust Crash Course\", \"genre\": \"Tech\", \"watch_duration_mins\": 55},\n    {\"title\": \"Weekly Yoga Routine for Beginners\", \"genre\": \"Lifestyle\", \"watch_duration_mins\": 20},\n    {\"title\": \"10-Minute Meditation for Stress Reller\", \"genre\": \"Lifestyle\", \"watch_duration_mins\": 15},\n    {\"title\": \"Standup Comedy Special\", \"genre\": \"Comedy\", \"watch_duration_mins\": 15},\n    {\"title\": \"Funny Animal Fails Compilation\", \"genre\": \"Comedy\", \"watch_duration_mins\": 15},\n    {\"title\": \"How to Make Your Friends Laugh\", \"genre\": \"Comedy\", \"watch_duration_mins\": 6},\n]",
+    "expectedOutput": "```\nTop 2 videos in genre 'Business': Investing 101 Crash Course (4.8), Ultimate Guide to Digital Marketing (4.5)\nTop 2 videos in genre 'Tech': Rust Crash Course (4.9), React Crash Course (4.7)\nTop 2 videos in genre 'Lifestyle': Weekly Yoga Routine for Beginners (4.3), 10-Minute Meditation (4.1)\nTop 2 videos in genre 'Comedy': Standup Comedy Special (4.9), Funny Animal Fails Compilation (4.6)\n```"
+  },
+  {
+    "id": "py-3",
+    "title": "Queue Buffer Processing (Newsfeed Engagement)",
+    "difficulty": "Medium",
+    "statement": "A queue is a buffer/cache with a fixed size. Assuming the buffer holds only 3 events, write a function that processes an event stream. Every time the buffer is full, output:\n1. The number of engagements,\n2. The total time spent (in seconds, from `viewed_time_ms`),\n3. The post IDs in the buffer.\n\nIgnore any test content (items where `is_test_content` is True).",
+    "type": "python",
+    "initialCode": "# Write your solution here\n\n",
+    "testInput": "stream = [\n    {'post_id': 101, 'viewed_time_ms': 6500, 'engaged_with_post': 1},\n    {'post_id': 104, 'viewed_time_ms': 200,  'engaged_with_post': 1},\n    {'post_id': 105, 'viewed_time_ms': 4200, 'engaged_with_post': 0, 'is_test_content': True},\n    {'post_id': 108, 'viewed_time_ms': 4499, 'engaged_with_post': 1},\n    {'post_id': 105, 'viewed_time_ms': 500,  'engaged_with_post': 1},\n]",
+    "expectedOutput": "```\nYou've got 2 engagements and spent 6.700s viewing content. Post ids: 101, 104\nYou've got 2 engagements and spent 4.699s viewing content. Post ids: 104, 108\nYou've got 2 engagements and spent 4.999s viewing content. Post ids: 108, 105\n```"
+  },
+  {
+    "id": "py-4",
+    "title": "Delivery Time Estimation (Routing State Machine)",
+    "difficulty": "Hard",
+    "statement": "Given a list of `routing_steps` (each step is TRAVEL, PICKUP, or DROPOFF for a given driver) and a `travel_time` matrix indexed by `location_id`, create a mapping from `order_id` to the expected delivery time.",
+    "type": "python",
+    "initialCode": "# Write your solution here\n\n",
+    "testInput": "routing_steps = [\n    {\"driver_id\": 1, \"action\": \"TRAVEL\",  \"location_id\": 1},\n    {\"driver_id\": 2, \"action\": \"TRAVEL\",  \"location_id\": 3},\n    {\"driver_id\": 1, \"action\": \"PICKUP\",  \"order_id\": 1},\n    {\"driver_id\": 1, \"action\": \"TRAVEL\",  \"location_id\": 2},\n    {\"driver_id\": 2, \"action\": \"PICKUP\",  \"order_id\": 2},\n    {\"driver_id\": 2, \"action\": \"PICKUP\",  \"order_id\": 3},\n    {\"driver_id\": 2, \"action\": \"TRAVEL\",  \"location_id\": 4},\n    {\"driver_id\": 2, \"action\": \"PICKUP\",  \"order_id\": 4},\n    {\"driver_id\": 1, \"action\": \"DROPOFF\", \"order_id\": 1},\n    {\"driver_id\": 1, \"action\": \"TRAVEL\",  \"location_id\": 5},\n    {\"driver_id\": 2, \"action\": \"DROPOFF\", \"order_id\": 4},\n    {\"driver_id\": 2, \"action\": \"DROPOFF\", \"order_id\": 2},\n    {\"driver_id\": 2, \"action\": \"TRAVEL\",  \"location_id\": 1},\n    {\"driver_id\": 2, \"action\": \"DROPOFF\", \"order_id\": 3},\n]\n\ntravel_time = [\n    [ 0, 10, 17, 23,  9, 13 ],\n    [10,  0, 30, 25,  5, 25 ],\n    [17, 30,  0, 10,  7, 33 ],\n    [23, 25, 10,  0, 11, 35 ],\n    [ 9,  5,  7, 11,  0, 27 ],\n    [13, 25, 33, 35, 27,  0 ],\n]",
+    "expectedOutput": "Print in the format:\n```\norder <order_id> is expected to be delivered at <time>\n```\nfor each order, where `<time>` is accumulated travel time per driver."
+  },
+  {
+    "id": "py-5",
+    "title": "Vehicle Capacity Feasibility (Carpool Sweep)",
+    "difficulty": "Medium",
+    "statement": "Given the total passenger capacity of a vehicle and a list of booking requests (with pickup/drop-off times and passenger counts), return `True` if all bookings can be accommodated without exceeding capacity at any point in time; otherwise `False`.",
+    "type": "python",
+    "initialCode": "# Write your solution here\n\n",
+    "testInput": "vehicle_passenger_capacity = 6\nbooking_requests = [\n    {\"request_id\": 1, \"pickup_time\": 10, \"drop_off_time\": 20, \"total_passengers\": 3},\n    {\"request_id\": 2, \"pickup_time\": 15, \"drop_off_time\": 25, \"total_passengers\": 2},\n    {\"request_id\": 3, \"pickup_time\": 30, \"drop_off_time\": 40, \"total_passengers\": 3},\n    {\"request_id\": 4, \"pickup_time\": 35, \"drop_off_time\": 45, \"total_passengers\": 1},\n    {\"request_id\": 5, \"pickup_time\": 50, \"drop_off_time\": 60, \"total_passengers\": 4},\n    {\"request_id\": 6, \"pickup_time\": 55, \"drop_off_time\": 80, \"total_passengers\": 1},\n    {\"request_id\": 7, \"pickup_time\": 70, \"drop_off_time\": 85, \"total_passengers\": 3},\n    {\"request_id\": 8, \"pickup_time\": 75, \"drop_off_time\": 100, \"total_passengers\": 1},\n    {\"request_id\": 9, \"pickup_time\": 90, \"drop_off_time\": 100, \"total_passengers\": 1},\n]",
+    "expectedOutput": "```\nTrue\n```"
+  },
+  {
+    "id": "py-6",
+    "title": "Reciprocal Followers + Follow Recommendations (Twitter Graph)",
+    "difficulty": "Medium",
+    "statement": "For each user, return a list `[reciprocal_follower_count, follow_recommendations]` where:\n- A reciprocal follower is a user that the current user follows AND who follows them back.\n- A follow recommendation is any user in the overall user set that is not the user themselves and not already followed by the user.",
+    "type": "python",
+    "initialCode": "# Write your solution here\n\n",
+    "testInput": "user_follows = {\n    'A': ['B', 'C', 'D'],\n    'B': ['D', 'E', 'F', 'A'],\n    'C': ['F', 'A', 'E'],\n    'D': [],\n}",
+    "expectedOutput": "```python\n{\n    'A': [2, ['E', 'F']],\n    'B': [1, ['C']],\n    'C': [1, ['B', 'D']],\n    'D': [0, ['A', 'B', 'C', 'E', 'F']],\n}\n```"
+  },
+  {
+    "id": "py-7",
+    "title": "Single Car Rental Conflict (Interval Acceptance)",
+    "difficulty": "Medium",
+    "statement": "Given an ordered dictionary of rental orders (by `order_id`) for a single car, accept or reject each order based on conflict with previously accepted orders. Process in `order_id` order.",
+    "type": "python",
+    "initialCode": "# Write your solution here\n\n",
+    "testInput": "rental_orders_by_id = {\n    21: {\"pickup_date\": \"2025-03-01\", \"dropoff_date\": \"2025-03-07\"},\n    22: {\"pickup_date\": \"2025-03-10\", \"dropoff_date\": \"2025-03-13\"},\n    23: {\"pickup_date\": \"2025-03-02\", \"dropoff_date\": \"2025-03-11\"},\n    24: {\"pickup_date\": \"2025-03-08\", \"dropoff_date\": \"2025-03-28\"},\n    25: {\"pickup_date\": \"2025-02-15\", \"dropoff_date\": \"2025-02-25\"},\n    26: {\"pickup_date\": \"2025-02-27\", \"dropoff_date\": \"2025-02-28\"},\n    27: {\"pickup_date\": \"2025-03-10\", \"dropoff_date\": \"2025-03-31\"},\n    28: {\"pickup_date\": \"2025-03-13\", \"dropoff_date\": \"2025-03-30\"},\n    29: {\"pickup_date\": \"2025-03-14\", \"dropoff_date\": \"2025-03-30\"},\n}",
+    "expectedOutput": "```\n21 ok, 22 ok, 23 rejected, 24 rejected, 25 ok, 26 ok, 27 rejected, 28 rejected, 29 ok\n```"
+  },
+  {
+    "id": "py-8",
+    "title": "Streaming Genre Running Average (YouTube Variant)",
+    "difficulty": "Easy",
+    "statement": "Process `youtube_video_views` row by row. After each row, print the genre and its current running average `watch_duration_mins` across all rows seen so far in that genre.",
+    "type": "python",
+    "initialCode": "# Write your solution here\n\n",
+    "testInput": "youtube_video_views = [\n    {\"title\": \"Ultimate Guide to Digital Marketing\", \"video_length_mins\": 50, \"genre\": \"Business\",   \"watch_duration_mins\": 45},\n    {\"title\": \"Investing 101 Crash Course\",          \"video_length_mins\": 70, \"genre\": \"Business\",   \"watch_duration_mins\": 50},\n    {\"title\": \"React Crash Course\",                  \"video_length_mins\": 60, \"genre\": \"Technology\", \"watch_duration_mins\": 55},\n    {\"title\": \"Rust Crash Course\",                   \"video_length_mins\": 60, \"genre\": \"Technology\", \"watch_duration_mins\": 50},\n    {\"title\": \"Weekly Yoga Routine for Beginners\",   \"video_length_mins\": 25, \"genre\": \"Lifestyle\",  \"watch_duration_mins\": 20},\n    {\"title\": \"10-Minute Meditation for Stress Relief\",\"video_length_mins\": 10, \"genre\": \"Lifestyle\",\"watch_duration_mins\": 15},\n    {\"title\": \"Standup Comedy Special\",              \"video_length_mins\": 60, \"genre\": \"Comedy\",     \"watch_duration_mins\": 15},\n    {\"title\": \"Funny Animal Fails Compilation\",      \"video_length_mins\": 15, \"genre\": \"Comedy\",     \"watch_duration_mins\": 15},\n    {\"title\": \"How to Make Your Friends Laugh\",      \"video_length_mins\": 6,  \"genre\": \"Comedy\",     \"watch_duration_mins\": 6},\n]",
+    "expectedOutput": "After each row, print the genre name and the running average `watch_duration_mins` for that genre."
+  },
+  {
+    "id": "py-9",
+    "title": "Most Common Theme Across Books",
+    "difficulty": "Easy",
+    "statement": "Given a mapping between book titles and a list of themes they contain, find the theme that appears the most times across all books. If multiple themes tie, return any one of them.",
+    "type": "python",
+    "initialCode": "# Write your solution here\n\n",
+    "testInput": "{\n    \"1984\":            [\"dystopia\", \"politics\"],\n    \"Brave New World\": [\"dystopia\", \"science\"],\n    \"Fahrenheit 451\":  [\"dystopia\"],\n}",
+    "expectedOutput": "`\"dystopia\"`"
+  },
+  {
+    "id": "py-10",
+    "title": "Most Common Unique Comment Across Locations",
+    "difficulty": "Easy",
+    "statement": "Given a dictionary mapping locations to lists of comments, return the most common comment across all locations, where duplicates within a single location are collapsed (counted once per location).",
+    "type": "python",
+    "initialCode": "# Write your solution here\n\n",
+    "testInput": "comments = {\n    \"Blue Hill\":     [\"Cozy Atmosphere\", \"Curated Selection\", \"Too busy\", \"Cozy Atmosphere\"],\n    \"Apple Road\":    [\"Good Parking\", \"Sweet and Delicious\", \"Perfect for rainy Days\"],\n    \"Orange Avenue\": [\"Cozy Atmosphere\", \"Large Bike Storage\", \"Curated Selection\", \"Curated Selection\"],\n}",
+    "expectedOutput": "`\"Cozy Atmosphere\"` or `\"Curated Selection\"` (both appear at 2 locations — return either)."
+  },
+  {
+    "id": "py-11",
+    "title": "Peak Concurrent Meeting Attendance",
+    "difficulty": "Medium",
+    "statement": "Given a list of meetings (each with start hour, end hour as integers 1–24, and audience size), return the largest total number of people attending meetings simultaneously across any continuous period of time.",
+    "type": "python",
+    "initialCode": "# Write your solution here\n\n",
+    "testInput": "",
+    "expectedOutput": "An integer: peak concurrent attendance across all hours."
+  },
+  {
+    "id": "py-12",
+    "title": "Largest Classes Across 2 Consecutive Years (Workshops)",
+    "difficulty": "Medium",
+    "statement": "The bookstore hosts yearly workshops; each workshop repeats the same classes per year between `start` and `end` (inclusive). Given a list of workshops, return the largest number of classes hosted in total across any 2 consecutive years.",
+    "type": "python",
+    "initialCode": "# Write your solution here\n\n",
+    "testInput": "[\n    Workshop(name=\"Intro to archival science\", classes_per_year=4,  start=2000, end=2003),\n    Workshop(name=\"Bind your own book\",         classes_per_year=1,  start=2001, end=2004),\n    Workshop(name=\"Monthly discussion circle\",  classes_per_year=12, start=2004, end=2006),\n]",
+    "expectedOutput": "`25` — the pair 2004 (13 classes) + 2005 (12 classes)."
+  },
+  {
+    "id": "py-13",
+    "title": "Uncommon Elements Between Two Lists",
+    "difficulty": "Easy",
+    "statement": "Given two lists, return elements that appear in exactly one of the two lists (symmetric difference), with no duplicates. Order should be preserved (first list's unique items first, then second list's).",
+    "type": "python",
+    "initialCode": "# Write your solution here\n\n",
+    "testInput": "find_uncommon_elements([], [])                     == []\nfind_uncommon_elements([1, 2, 3], [4, 5, 6])        == [1, 2, 3, 4, 5, 6]\nfind_uncommon_elements([1, 2, 2, 3], [3, 3, 4])     == [1, 2, 4]\nfind_uncommon_elements([1, 2, 3], [1, 2, 3])        == []\nfind_uncommon_elements([1, -2, 3], [-1, 2, 3])      == [1, -2, -1]\nfind_uncommon_elements([\"apple\", \"banana\"], [\"banana\", \"cherry\"]) == [\"apple\", \"cherry\"]\nfind_uncommon_elements([10, 20, 30], [30, 40, 50])  == [10, 20, 40, 50]",
+    "expectedOutput": ""
+  },
+  {
+    "id": "py-14",
+    "title": "Find Editions of a Book (Prefix Match)",
+    "difficulty": "Medium",
+    "statement": "Given a list of book titles, find all \"editions\" of the same original book. An edition is any title that has the full title of another book (the original) as a prefix followed by a space (so the original title is a full word-prefix).",
+    "type": "python",
+    "initialCode": "# Write your solution here\n\n",
+    "testInput": "find_editions([\"Green Trees\", \"Python in a Nutshell\"]) == []\nsorted(find_editions([\"Green Trees\", \"Green Trees Second Edition\",\n                      \"Python in a Nutshell\", \"Python for Dummies\", \"Python\"])) \\\n    == sorted(['Python in a Nutshell', 'Python for Dummies', 'Green Trees Second Edition'])\nfind_editions([\"Python\", \"All About Pythons\"]) == []",
+    "expectedOutput": ""
+  },
+  {
+    "id": "py-15",
+    "title": "Bookshelf Fitting (Titles by Length)",
+    "difficulty": "Medium",
+    "statement": "Given two lists `bookshelf_sizes` (ints) and `bookshelf_titles` (strings), determine whether every title fits into some unused shelf, where a title fits into a shelf iff `len(title) <= size`. Each shelf holds at most one title.",
+    "type": "python",
+    "initialCode": "# Write your solution here\n\n",
+    "testInput": "can_fit_books([7, 9, 6],       ['education', 'novel', 'fiction'])   == True\ncan_fit_books([7, 9, 4],       ['education', 'novel', 'fiction'])   == False\ncan_fit_books([6, 4],          ['fantasy', 'science', 'romance'])   == False   # more titles than shelves\ncan_fit_books([7, 8, 9, 5],    ['mystery', 'classic'])              == True\ncan_fit_books([10],            ['encyclopedia'])                    == False\ncan_fit_books([4],             ['note'])                            == True\ncan_fit_books([3, 4, 5],       ['a', 'bc', 'def'])                  == True\ncan_fit_books([2, 2],          ['aa', 'bbb'])                       == False\ncan_fit_books([3, 4, 5],       [])                                  == True\ncan_fit_books([],              ['book'])                            == False",
+    "expectedOutput": ""
+  },
+  {
+    "id": "py-16",
+    "title": "Nth Most Sold Book (Two Tie-Break Variants)",
+    "difficulty": "Easy",
+    "statement": "Given a list of `(price, sales_count)` tuples and an integer `n` (1-indexed), return the nth most sold book as a tuple. Primary sort is descending by `sales_count`. Secondary (tie-breaker) comes in two variants:\n- **Version 1:** ascending by price (cheaper book wins tie).\n- **Version 2:** descending by price (more expensive book wins tie).\n\nReturn `None` if the list is empty or `n` is invalid (`n <= 0` or `n > len`).",
+    "type": "python",
+    "initialCode": "# Write your solution here\n\n",
+    "testInput": "books = [\n    (20.99, 5), (15.99, 7), (30.50, 5), (10.99, 3), (25.00, 7),\n]",
+    "expectedOutput": "- Version 1, n=1 → `(15.99, 7)`\n- Version 2, n=1 → `(25.00, 7)`"
+  },
+  {
+    "id": "py-17",
+    "title": "Max Reading-Program Score (3 Distinct Categories)",
+    "difficulty": "Medium",
+    "statement": "A student can score points from up to 3 books, each from a different category. Given a list of `(category, score)` tuples for books the student read, return the maximum possible total score.",
+    "type": "python",
+    "initialCode": "# Write your solution here\n\n",
+    "testInput": "get_max_score([(\"Adventure\",5), (\"Adventure\",2), (\"History\",3)])            == 8\nget_max_score([(\"Adventure\",4), (\"History\",3), (\"Reference\",1), (\"Fiction\",2)]) == 9\nget_max_score([(\"Biography\",2), (\"Biography\",4), (\"Science\",3), (\"Science\",1)]) == 7\nget_max_score([])                                                            == 0",
+    "expectedOutput": ""
+  },
+  {
+    "id": "py-18",
+    "title": "Validate Library Checkout/Return Log",
+    "difficulty": "Easy",
+    "statement": "Each log entry has a `book_id` and `is_checkout` flag (True = checkout, False = return). Given an ordered list of entries, return `False` if:\n- a book is checked out while already checked out, or\n- a book is returned while not currently checked out.\n\nOtherwise return `True`. Assume no books are checked out before the first log entry.",
+    "type": "python",
+    "initialCode": "# Write your solution here\n\n",
+    "testInput": "[LogEntry(1, T), LogEntry(2, T), LogEntry(1, F), LogEntry(1, T)]    # True\n[LogEntry(1, T), LogEntry(2, T), LogEntry(1, T)]                     # False\n[LogEntry(1, T), LogEntry(2, F), LogEntry(1, T)]                     # False\n[LogEntry(1, T), LogEntry(2, T), LogEntry(1, F), LogEntry(2, F)]    # True\n[LogEntry(3, T), LogEntry(3, F), LogEntry(3, F)]                     # False",
+    "expectedOutput": ""
+  },
+  {
+    "id": "py-19",
+    "title": "Library Location Reroute on Closure",
+    "difficulty": "Medium",
+    "statement": "The library has 4 locations. The given dictionary shows, for each location, how many employees are normally assigned there, and how many will go to each other location (or home) when theirs closes. Given a set of closed locations, return a dict of the total number of employees expected at each remaining (open) location.",
+    "type": "python",
+    "initialCode": "# Write your solution here\n\n",
+    "testInput": "location_employees = {\n    \"A\": {\"A\": 80,  \"B\": 10,  \"C\": 15,  \"D\": 5},\n    \"B\": {\"A\": 5,   \"B\": 120, \"C\": 10,  \"D\": 0},\n    \"C\": {\"A\": 5,   \"B\": 10,  \"C\": 110, \"D\": 0},\n    \"D\": {\"A\": 5,   \"B\": 0,   \"C\": 10,  \"D\": 240},\n}",
+    "expectedOutput": "```python\nget_num_employees(loc, set())              == {\"A\": 80,  \"B\": 120, \"C\": 110, \"D\": 240}\nget_num_employees(loc, {\"A\"})              == {\"B\": 130, \"C\": 125, \"D\": 245}\nget_num_employees(loc, {\"D\", \"C\"})         == {\"A\": 90,  \"B\": 130}\nget_num_employees(loc, {\"A\",\"B\",\"C\",\"D\"})  == {}\n```"
+  },
+  {
+    "id": "py-20",
+    "title": "Deletions to Transform src → tgt (Two Variants)",
+    "difficulty": "Medium",
+    "statement": "Given two words `src` and `tgt`, determine whether `tgt` can be formed by deleting characters from `src` without re-ordering. If impossible, return `None`.\n\nTwo variants:\n- **Total count** of deleted characters (counting duplicates).\n- **Distinct letters** deleted (set cardinality of removed letters).",
+    "type": "python",
+    "initialCode": "# Write your solution here\n\n",
+    "testInput": "deletions_total(\"fiction\", \"fin\") == 4\ndeletions_total(\"balloon\", \"ban\") == 4   # l,l,o,o\ndeletions_total(\"abc\", \"abc\")     == 0\ndeletions_total(\"abc\", \"\")        == 3\ndeletions_total(\"abc\", \"abcd\")    is None\ndeletions_total(\"abc\", \"cba\")     is None\ndeletions_total(\"\", \"a\")          is None\ndeletions_total(None, \"a\")        is None",
+    "expectedOutput": ""
+  },
+  {
+    "id": "sql-1",
+    "title": "Content Watched > 10 Minutes Cumulative (Streaming)",
+    "difficulty": "Medium",
+    "statement": "For content that has been watched more than 10 minutes cumulative (total across all sessions), list the `content_id`, number of viewers (`num_viewers`), and total view time (`total_view_time`).\n\n**Schema:**\n- `fct_view_logs (session_id, user_id, content_id, start_ts, end_ts, date)`\n- `dim_content (content_id, content_type, title, genre, studio_id, creation_date, date)`",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-2",
+    "title": "Cumulative Studio Metrics (Daily Incremental Update)",
+    "difficulty": "Medium",
+    "statement": "Update `cumulative_studio_metrics` daily with `total_view_time_1d` (today only) and `total_view_time_lifetime` (cumulative through today) for each studio.\n\n**Schema:**\n- `fct_view_logs (session_id, user_id, content_id, start_ts, end_ts, date)`\n- `dim_content (content_id, studio_id, ...)`\n- `cumulative_studio_metrics (studio_id, date, total_view_time_1d, total_view_time_lifetime)`",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-3",
+    "title": "Video Completion Rate + Avg View Time (Newsfeed)",
+    "difficulty": "Medium",
+    "statement": "Limited to today, for video content, return:\n- % of video views that reached full duration,\n- Total time spent watching videos,\n- Average view length.\n\n**Schema:**\n- `fct_newsfeed_action (date, user_id, session_id, content_id, action_id, action_type, view_start, view_end)`\n- `dim_content (date, content_id, content_type, creator_id, creation_date, video_length_seconds)`",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-4",
+    "title": "Content with Reaction but No Comment (Newsfeed)",
+    "difficulty": "Medium",
+    "statement": "What percentage of content generated today had a reaction but no comments today?\n\n**Schema:**\n`fct_newsfeed_action` (with `action_type` including 'reaction', 'comment').",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-5",
+    "title": "Carpool Ratio to All Trips (Last 30 Days)",
+    "difficulty": "Easy",
+    "statement": "Compute the ratio of carpool trips to all trips in the last 30 days.\n\n**Schema:**\n- `fct_rides (ride_id, user_id, driver_id, vehicle_id, ride_type, region, start_time, end_time, date)`\n- `dim_vehicle (vehicle_id, type, capacity)`",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-6",
+    "title": "Rank Vehicle Types by Time Spent in Pool (Carpool / DoorDash)",
+    "difficulty": "Medium",
+    "statement": "Rank vehicle types by most used for pooled rides/deliveries, where \"most used\" is measured by total customer time spent in vehicle (sum of `end_time - start_time` for pool trips).\n\n**Schema:**\n- `fct_rides` (or `fct_deliveries`) joined with `dim_vehicle` on `vehicle_id`.",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-7",
+    "title": "Drivers With More Pool Rides Than Regular",
+    "difficulty": "Medium",
+    "statement": "Return the number of drivers who made more pool rides than regular rides.\n\n**Schema:**\n`fct_rides` with `ride_type` = 'pool' or 'regular' and `driver_id`.",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-8",
+    "title": "Pooled-to-All Delivery Ratio Dashboard (GROUPING SETS)",
+    "difficulty": "Hard",
+    "statement": "Build a dashboard aggregation table showing the ratio of pooled to all deliveries across `region × vehicle_type × delivery_date`, using `GROUPING SETS` to include subtotals and grand totals.\n\n**Schema:**\nDelivery fact table with `region`, `vehicle_type`, `delivery_date`, `delivery_type` (pool vs regular).",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-9",
+    "title": "Average Order Value per User's City Today (Instamart)",
+    "difficulty": "Easy",
+    "statement": "Compute the average order value grouped by the user's city for orders placed today.\n\n**Schema:**\n- `dim_users` (user_id, city, …)\n- `dim_stores`\n- `fct_order (order_id, store_id, driver_id, user_id, order_type, item_count, order_placed_ts, order_received_ts, store_accept_ts, order_prep_start_ts, order_ready_ts, driver_pickup_ts, order_delivery_ts, cancelled_by, cancellation_reason, net_order_amount, date)`",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-10",
+    "title": "Stores with More Pickups Than Deliveries Today",
+    "difficulty": "Easy",
+    "statement": "How many stores today had more pickups than deliveries?\n\n**Schema:**\n`fct_order` with `order_type` in ('pickup', 'delivery').",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-11",
+    "title": "Top 3 Most Popular Cuisines Last Month (by Customer Count)",
+    "difficulty": "Easy",
+    "statement": "Return the top 3 most popular cuisines last month, ranked by number of distinct customers.\n\n**Schema:**\n`fct_order` joined with `dim_stores` (which has `cuisine`).",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-12",
+    "title": "Follow Acceptance Rate — Users Who Went Private (Last 7 Days)",
+    "difficulty": "Medium",
+    "statement": "For users who went private in the last 7 days, compute the overall follow acceptance rate.\n\n**Schema:**\n- `Dim_user (User_id, privacy_setting, privacy_setting_last_update_ts, date)`\n- `Fct_follows (Source_user, Target_user, action, action_ts)` — action ∈ {follow_request, follow_accept, follow_success, reject, unfollow}",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-13",
+    "title": "Per-User Follow Acceptance Stats — Users Who Went Private (Last 7 Days)",
+    "difficulty": "Hard",
+    "statement": "For requesters who went private in the last 7 days, return:\n- Count of requesters,\n- Average acceptance rate per requester,\n- Min acceptance rate,\n- Max acceptance rate.\n\n**Schema:**\nSame as Q12.",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-14",
+    "title": "Build dim_follows Table (SCD-like)",
+    "difficulty": "Medium",
+    "statement": "Create `dim_follows` from `fct_follows`: each row represents an active follow relationship with a `valid_from` timestamp.\n\n**Schema:**\nSource: `Fct_follows` (event log).\nTarget: `dim_follows (date, source, target, valid_from)`.",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-15",
+    "title": "dim_follows with is_reciprocal Flag (Self Join)",
+    "difficulty": "Medium",
+    "statement": "Create `dim_follows` augmented with an `is_reciprocal` boolean indicating whether both directions of the follow edge exist.\n\n**Schema:**\nSame as Q14.",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-16",
+    "title": "California Car Rental Metrics by Car Size (Last Year)",
+    "difficulty": "Medium",
+    "statement": "For rentals picked up in California last year, grouped by car size, return:\n- Total reservations,\n- Distinct users,\n- Ratio (average rentals per user).\n\n**Schema:**\n- `dim_cars (car_id, make, model, year, size, license_plate_number, location_id)`\n- `dim_locations (location_id, address, city, state, zip, country, type)`\n- `dim_users (user_id, name, email, license_number, license_state)`\n- `fct_rentals (rental_id, user_id, car_id, pickup_location_id, dropoff_location_id, pickup_time, dropoff_time, rate_per_day)`",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-17",
+    "title": "Car Utilization Rate by Size",
+    "difficulty": "Medium",
+    "statement": "Utilization rate = cars rented / cars in location, broken down by car size.\n\n**Schema:**\nSame as Q16.",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-18",
+    "title": "Rolling 30-Day Active Users on Newsfeed",
+    "difficulty": "Medium",
+    "statement": "Return the count of users active on Newsfeed in the last rolling 30 days.\n\n**Schema:**\nNewsfeed activity log (`fct_newsfeed_action` or similar with `user_id`, `date`).",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-19",
+    "title": "Users Who Reacted Exclusively to Media Today",
+    "difficulty": "Medium",
+    "statement": "Count users who reacted today exclusively to media (photo or video) — i.e., they have ≥1 reaction today AND zero reactions today on non-media content.\n\n**Schema:**\nInteraction fact with `user_id`, `content_type` (photo/video vs other), `action_type = 'reaction'`, `date`.",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-20",
+    "title": "Sales Volume and Unique Paying Customers by Payment Type",
+    "difficulty": "Easy",
+    "statement": "What was the total volume of sales and the unique number of paying customers grouped and sorted in descending order by `payment_type`?\n\n**Schema:**\n`transactions (transaction_id, book_id, customer_id, payment_amount, book_count, tax_rate, discount_rate, transaction_date, payment_type)`",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-21",
+    "title": "Top 3 Customers by Sales Value of People They Invited",
+    "difficulty": "Medium",
+    "statement": "Find the top 3 customers ordered by the total sales value of the people they directly invited.\n\n**Schema:**\n- `customers (customer_id, invited_by_customer_id, …)`\n- `transactions (customer_id, payment_amount, …)`",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-22",
+    "title": "Top 5 Customers by Avg Payment-per-Book of Invitees",
+    "difficulty": "Medium",
+    "statement": "Find the IDs of the top 5 customers ordered by the average payment per book of the people they invited.\n\n**Schema:**\nSame as Q21 (plus `transactions.book_count`).",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-23",
+    "title": "Authors with http:// + Zero Sales (vs Total Authors)",
+    "difficulty": "Medium",
+    "statement": "Find the number of authors who have website URLs prefixed with `http://` and have never made a sale. Compare this with the total number of authors.\n\n**Schema:**\n- `authors (author_id, first_name, last_name, birthday, website_url)`\n- `books (book_id, author_id, …)`\n- `transactions (book_id, …)`",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-24",
+    "title": "% of Authors with .com + No Sales (Extended)",
+    "difficulty": "Medium",
+    "statement": "Find the total number of authors registered at the bookstore, what percentage of them have a website URL containing `.com` and have never made any sale, and (in Q6 extension) the number of authors with more than 5 books sold.\n\n**Schema:**\nSame as Q23.",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-25",
+    "title": "Top 3 Customers by Copies of Books from 3+ Authors in Same Category",
+    "difficulty": "Hard",
+    "statement": "Find customers who have purchased groups of books where each group contains books from at least 3 different authors AND all books in the group belong to the same category. Return the top 3 customers ordered by how many copies of these books they purchased.\n\n**Schema:**\n- `transactions (customer_id, book_id, book_count, …)`\n- `books (book_id, author_id, category, …)`",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-26",
+    "title": "Top 2 Months with Customers Returning From Previous Month",
+    "difficulty": "Hard",
+    "statement": "Find the top 2 months with the highest number of unique customers that purchased books in both that month and the previous month.\n\n**Schema:**\n`transactions (customer_id, transaction_date, …)`.",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-27",
+    "title": "Authors Who Published at Least 5 Genres",
+    "difficulty": "Easy",
+    "statement": "Find the `author_id`s who published at least 5 different genres. Order by genre count.\n\n**Schema:**\n`books (id, title, author_id, genre, …)` (Set 3 schema).",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-28",
+    "title": "Percent of Sales on Same Day as Registration",
+    "difficulty": "Medium",
+    "statement": "What percent of sales occurred on the same day that the customer registered?\n\n**Schema:**\n- `sales (id, book_id, customer_id, amount, transaction_date, refunded)`\n- `customers (id, registration_date, …)`",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-29",
+    "title": "Customers Bought > 3 Books on First + Last Shopping Days Combined",
+    "difficulty": "Hard",
+    "statement": "Find customers who shopped on more than 1 day AND who bought more than 3 books on the first and last days of shopping combined.\n\n**Schema:**\nSame as Q28.",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-30",
+    "title": "% Customers With Unpurchased Genre Interest (UNNEST Array)",
+    "difficulty": "Hard",
+    "statement": "What percent of customers have a genre interest from which they have not yet purchased a book?\n\n**Schema:**\n- `customers (id, genre_interests VARCHAR[])` (array column)\n- `sales (customer_id, book_id, …)`\n- `books (id, genre, …)`",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-31",
+    "title": "Copies in 'good' Condition Not Returned + % Renewed > 2x",
+    "difficulty": "Easy",
+    "statement": "How many book copies are in `'good'` condition AND have not been returned (still checked out)? Of those, what percentage have been renewed more than 2 times in their current checkout?\n\n**Schema:**\n- `copies (copy_id, book_id, condition, source, price_at_purchase, reserved_by_member_id)`\n- `checkouts (checkout_id, copy_id, member_id, checkout_date, due_date, returned_date, renewal_count, late_fee)`",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-32",
+    "title": "Top 3 Books by Lifetime Value with > 10 Copies",
+    "difficulty": "Medium",
+    "statement": "The \"lifetime value\" of a book is the total number of days it was checked out (only counting checkouts that have been returned). Return the top 3 books with the highest lifetime value among books that have more than 10 copies.\n\n**Schema:**\nSame as Q31 + `books (book_id, …)`.",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  },
+  {
+    "id": "sql-33",
+    "title": "Largest Reserved-Copies Difference vs Inviter",
+    "difficulty": "Medium",
+    "statement": "Find the member with the largest absolute difference in number of reserved book copies between themselves and the member who invited them. Include members with 0 reserved copies.\n\n**Schema:**\n- `members (member_id, invited_by_member_id, …)`\n- `copies` (with `reserved_by_member_id`)",
+    "type": "sql",
+    "initialCode": "-- Write your SQL query here\nSELECT * FROM ...",
+    "setupSql": ""
+  }
+]

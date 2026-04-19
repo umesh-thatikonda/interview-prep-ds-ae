@@ -1,0 +1,2093 @@
+Meta Tech Screen Questions 
+
+Points to Note :  
+
+1.  Currently, we have 4 sets of questions for SQL and Python and an additional Python set 
+2.  We will send you an updated document if we receive any additional questions 
+3.  Solutions provided here are right answers, but you need to practice them in different 
+approaches. You need to prepare at least two different approaches for each question 
+[Mandatory].  
+
+4.  Please research the solution thoroughly, so that you can explain the approach to the 
+
+interviewer correctly.  
+
+5.  Please make sure you have enough time for both the sections. I suggest you don't take 
+
+more than 30 mins for the SQL section so that you have enough time for Python. 
+6.  Please put every question in GPT and try to generate edge cases and make sure your 
+
+code is satisfying all the test cases. 
+
+7.  Always follow interviewers lead, take their hints and act accordingly, write the coding 
+
+solution according to the approach they expect. 
+
+8.  Expect “What is INNER JOIN changes to LEFT JOIN, will the output of the query 
+
+change?” kind of questions in the interview, please practice accordingly. 
+
+9.  Learn SQL EXECUTION ORDER, which is the most basic yet important concept. 
+
+                           All the Best! 
+
+!!! Please don’t share this with anyone. It will decrease your chances of getting an offer 
+and can also lead to serious issues 
+
+SQL Section:  
+
+Note : The following data model is the same for the two sets provided below.  
+Please go through the data model and get ready with some questions to ask the interviewer. 
+
+●  Don’t just dive into your answers directly 
+
+Data Model :  
+
+### Table: books 
+| Column            | Type    | 
+|-------------------|---------| 
+| book_id         | INT (KEY) | 
+| title           | VARCHAR | 
+| author_id       | INT     | 
+| publication_date| DATE    | 
+| category        | VARCHAR | 
+| price           | DOUBLE  | 
+
+### Table: authors 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+| Column            | Type    | 
+|-------------------|---------| 
+| author_id       | INT (KEY) | 
+| first_name      | VARCHAR | 
+| last_name       | VARCHAR | 
+| birthday        | DATE    | 
+| website_url     | VARCHAR | 
+
+### Table: transactions 
+| Column            | Type    | 
+|-------------------|---------| 
+| transaction_id  | INT (KEY) | 
+| book_id         | INT     | 
+| customer_id     | INT     | 
+| payment_amount  | DOUBLE  | 
+| book_count      | INT     | 
+| tax_rate        | DOUBLE  | 
+| discount_rate   | DOUBLE  | 
+| transaction_date| DATE    | 
+| payment_type    | VARCHAR | 
+
+### Table: customers 
+| Column            | Type    | 
+|-------------------|---------| 
+| customer_id     | INT (KEY) | 
+| first_name      | VARCHAR | 
+| last_name       | VARCHAR | 
+| registration_date| DATE    | 
+| interested_in_categories | VARCHAR | 
+| is_rewards_member| BOOLEAN| 
+| invited_by_customer_id | INT | 
+
+Q1) [Set 1] :  
+What was the total number of sold books and the unique number of sold books, grouped and 
+sorted in descending order by payment_type? 
+
+SELECT  
+    payment_type,                      -- Payment method used in the transactions (e.g., credit card, 
+cash) 
+    SUM(book_count) AS total_sold_books,     -- Total number of books sold for each payment 
+type 
+    COUNT(DISTINCT book_id) AS unique_sold_books  -- Count of unique books sold for 
+each payment type 
+FROM  
+
+ 
+ 
+ 
+ 
+ 
+    transactions                       -- Source table containing transaction records 
+GROUP BY  
+    payment_type                       -- Grouping the results by payment type 
+ORDER BY  
+    payment_type DESC;                   -- Sorting the results in descending order based on total 
+number of books sold 
+
+[Set 2] :  
+What was the total volume of sales and the unique number of paying customers grouped and 
+sorted in descending order by payment type? 
+
+SELECT  
+    payment_type,  
+    SUM(payment_amount) AS total_sales_volume, 
+    COUNT(DISTINCT customer_id) AS unique_paying_customers 
+FROM  transactions                        
+GROUP BY payment_type                       
+ORDER BY payment_type DESC;  
+
+Q2): [Set 1] Find the top 3 customers ordered by the total sales value of the people they directly 
+invited. 
+
+SELECT 
+    c.invited_by_customer_id AS customer_id_who_invited_people,     
+SUM(t.payment_amount) AS sales_value_of_invited_people     
+FROM 
+    customers c                           
+JOIN 
+    transactions t                        
+ON 
+    c.customer_id = t.customer_id        
+WHERE 
+    c.invited_by_customer_id IS NOT NULL  
+GROUP BY 
+    c.invited_by_customer_id             
+ORDER BY 
+    sales_value_of_invited_people DESC  
+LIMIT 3;     
+
+[Set 2] Existing customers can invite other folks to sign up to the bookstore, and we need to find 
+the IDs of the top five customers. So find the IDs of the top five customers and order by the 
+average payment per book of the people they invited. 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+SELECT 
+    c.invited_by_customer_id AS customer_id_who_invited_people, 
+    SUM(t.payment_amount) / SUM(book_count)  AS avg_sales_value_of_invited_people 
+FROM customers c  
+JOIN transactions t ON c.customer_id = t.customer_id         
+WHERE c.invited_by_customer_id IS NOT NULL 
+GROUP BY c.invited_by_customer_id            
+ORDER BY avg_sales_value_of_invited_people DESC 
+LIMIT 5;        
+
+Expected Followup : Why don’t you use Avg function instead of doing a division? 
+Solution : We cannot use avg(payment_amount) since payment_amount is total amount of that 
+order which can have single or multiple books. So 
+sum(payment_amount)/count(payment_amount) != sum(payment_amount)/sum(book_count) 
+
+Q3) [Set 1] Find the number of authors who have website URLs prefixed with "http://" and that 
+have never made a sale. Compare this with the total number of authors. 
+
+-- Subquery to find authors who have made a sale 
+WITH authors_with_sales AS ( 
+    SELECT DISTINCT a.author_id 
+    FROM authors a 
+    JOIN books b ON a.author_id = b.author_id 
+    JOIN transactions t ON b.book_id = t.book_id 
+) 
+
+SELECT 
+    -- Calculate the number of authors with "http://" in their website URL and no sales 
+    SUM(CASE  
+            WHEN a.author_id NOT IN (SELECT author_id FROM authors_with_sales) 
+              AND a.website_url LIKE 'http://%'  
+            THEN 1  
+            ELSE 0  
+        END) AS authors_with_http_and_no_sales, 
+    COUNT(DISTINCT a.author_id) AS authors_in_total 
+FROM  
+    authors a; 
+
+[Set 2] Find Total Number of Authors who are registered at the bookstore and what percentage 
+of them who’s website URL ends with or has “.com” and have never made any sale. 
+WITH authors_with_sales AS ( 
+    SELECT a.author_id, a.website_url, COUNT(*) total_transactions 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+    FROM authors a 
+    JOIN books b ON a.author_id = b.author_id 
+    JOIN transactions t ON b.book_id = t.book_id 
+GROUP BY a.author_id, a.website_url 
+) 
+
+SELECT 
+    SUM(CASE  
+            WHEN total_transactions > 0  
+            THEN 1  
+            ELSE 0  
+        END) * 100.0 / COUNT(DISTINCT a.author_id) AS authors_with_no_sales, 
+    SUM(CASE WHEN a.website_url LIKE '%.com%' THEN 1 ELSE 0 END) * 100.0 / COUNT( 
+a.author_id) AS percentage_com_website, 
+    COUNT( a.author_id) AS authors_in_total 
+FROM  
+    authors_with_sales a; 
+
+Approach 2:  
+
+WITH authors_with_sales AS ( 
+    SELECT DISTINCT a.author_id 
+    FROM authors a 
+    JOIN books b ON a.author_id = b.author_id 
+    JOIN transactions t ON b.book_id = t.book_id 
+) 
+
+SELECT 
+    SUM(CASE  
+            WHEN a.author_id NOT IN (SELECT author_id FROM authors_with_sales) 
+            THEN 1  
+            ELSE 0  
+        END) * 100.0 / COUNT(DISTINCT a.author_id) AS authors_with_no_sales, 
+    SUM(CASE WHEN a.website_url LIKE '%.com%' THEN 1 ELSE 0 END) * 100.0 / 
+COUNT(DISTINCT a.author_id) AS percentage_com_website, 
+    COUNT(DISTINCT a.author_id) AS authors_in_total 
+FROM  
+    authors a; 
+
+Approach 3:  
+
+WITH authors_with_sales AS ( 
+    SELECT DISTINCT a.author_id 
+    FROM authors a 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+    JOIN books b ON a.author_id = b.author_id 
+    JOIN transactions t ON b.book_id = t.book_id 
+) 
+
+SELECT 
+    SUM(CASE  
+            WHEN b.author_id IS NULL 
+            THEN 1  
+            ELSE 0  
+        END) * 100.0 / COUNT(DISTINCT a.author_id) AS authors_with_no_sales, 
+    SUM(CASE WHEN a.website_url LIKE '%.com%' THEN 1 ELSE 0 END) * 100.0 / 
+COUNT(DISTINCT a.author_id) AS percentage_com_website, 
+    COUNT(DISTINCT a.author_id) AS authors_in_total 
+FROM  
+    authors a LEFT JOIN authors_with_sales b ON a.author_id = b.author_id 
+
+With author_sales_summary as ( 
+select a.author_id,a.website_url, 
+count(t.transaction_id) as transaction_count 
+from authors a 
+left join books b on a.author_id=b.author_id 
+left join transactions t on b.book_id=t.book_id 
+group by a.author_id,a.website_url 
+) 
+select 
+count(distinct author_id) as total_authors, 
+sum(case when  website_url like '%.com%' then 1 else 0 end)*100.00/count(distinct 
+author_id) as percentage_of_Authors, 
+sum(case when  transaction_count=0 then 1 else 0 end)*100.00/count(distinct author_id) 
+as percentage_of_no_sales_Authors 
+from  
+author_sales_summary; 
+
+4) [Set 2] Find customers who have purchased groups of books, where each group includes 
+books from at least 3 different authors, and all books in the group belong to the same category. 
+Show the IDs of the top 3 customers, ordered by how many copies of these books they 
+purchased. 
+
+SELECT customer_id, SUM(total_books) AS total_copies 
+FROM ( 
+    SELECT  
+        t.customer_id, 
+        b.category, 
+
+ 
+ 
+ 
+ 
+ 
+ 
+        COUNT(DISTINCT b.author_id) AS distinct_authors, 
+        SUM(book_count) AS total_books 
+    FROM transactions t  
+    JOIN books b ON t.book_id = b.book_id 
+    GROUP BY t.customer_id, b.category 
+) a  
+WHERE distinct_authors >= 3 
+GROUP BY customer_id 
+ORDER BY total_copies DESC  
+LIMIT 3; 
+
+5) [Set 2]  Find the top 2 months with the highest number of unique customers 
+  that purchased books in both that month and the previous month. 
+
+WITH customer_transactions AS ( 
+    SELECT  
+        customer_id,  
+        DATE_TRUNC('month', transaction_date) AS curr_month, 
+        LAG(DATE_TRUNC('month', transaction_date)) OVER(PARTITION BY customer_id 
+ORDER BY transaction_date) AS prev_month 
+    FROM transactions 
+) 
+SELECT curr_month 
+FROM customer_transactions 
+WHERE prev_month IS NOT NULL AND curr_month = prev_month + INTERVAL '1 month' 
+GROUP BY curr_month 
+ORDER BY COUNT(customer_id) DESC 
+LIMIT 2; 
+
+6) [Set 2] Find Total Number of Authors who are registered at the bookstore and what 
+percentage of them who’s website URL ends with or has “.com”, have never made any sale, 
+Number of authors with more than 5 books sold. 
+
+WITH authors_with_sales AS ( 
+    SELECT  
+        a.author_id,  
+        SUM(t.book_count) AS books_sold 
+    FROM authors a 
+    JOIN books b ON a.author_id = b.author_id 
+    JOIN transactions t ON b.book_id = t.book_id 
+    GROUP BY a.author_id 
+) 
+SELECT 
+
+ 
+ 
+ 
+ 
+ 
+    SUM(CASE WHEN b.author_id IS NULL THEN 1 ELSE 0 END) * 100.0 / 
+COUNT(a.author_id) AS authors_with_no_sales, 
+    SUM(CASE WHEN a.website_url LIKE '%.com%' THEN 1 ELSE 0 END) * 100.0 / 
+COUNT(a.author_id) AS percentage_com_website, 
+    COUNT(CASE WHEN b.books_sold > 5 THEN a.author_id ELSE NULL END) AS 
+authors_with_5_books 
+FROM  
+    authors a 
+LEFT JOIN authors_with_sales b  
+    ON a.author_id = b.author_id; 
+
+Python Section:  
+
+Note : Please provide optimal solutions and prepare two different approaches for the problem. 
+Also make sure you know time and space complexities.  
+
+Q1) [Set 1] Write a function which returns the largest positive number that can be generated by 
+rearranging the digits of another positive number. 
+
+def rearrange_digits(number: int) -> int: 
+    # Convert the number to a string and take the absolute value 
+    # (even though the input is guaranteed to be positive as per the problem statement) 
+    # Sort the digits in descending order 
+    sorted_digits = sorted( str(abs(number)), reverse=True) 
+
+    # Join the sorted digits into a single string 
+    res = “”.join(sorted_digits) 
+
+    # Print the intermediate result (for debugging purposes) 
+    print(res) 
+
+    # Convert the string back to an integer and return it 
+    return int(res) 
+
+Time Complexity O(nlogn) 
+
+Space Complexity O(n) 
+
+assert rearrange_digits(64521) == 65421 
+assert rearrange_digits(1001) == 1100 
+assert rearrange_digits(777) == 777 
+
+ 
+ 
+ 
+ 
+ 
+     
+     
+     
+ 
+ 
+assert rearrange_digits(987654321) == 987654321 
+assert rearrange_digits(9070) == 9700 
+assert rearrange_digits(8) == 8 
+assert rearrange_digits(0) == 0 
+assert rearrange_digits(-8679) == 9876 
+assert rearrange_digits(None) is None 
+assert rearrange_digits('') is None 
+
+[Set 2] Write a function which returns the smallest non-negative number that can be generated 
+by using all of the odd digits of another number? 
+
+Approach 1: 
+def smallest_number_from_odds(number): 
+    if not number:  
+      return None 
+    number = str(abs(number)) 
+    odd_digits = [ num for num in number if int(num)%2!=0] 
+    return int("".join(sorted(odd_digits))) if odd_digits else none 
+Approach 2: 
+def smallest_number_from_odds(number): 
+    res = 0 
+    if not number: 
+        return 
+    if number<0: 
+        number = abs(number) 
+    n_odd=[] 
+    for n in str(number): 
+        if int(n)%2 ==1: 
+            n_odd.append(n) 
+    n_odd = sorted(n_odd) 
+    if n_odd: 
+        res = int("".join(n_odd)) 
+    return res 
+Test Cases: 
+print(smallest_number_from_odds(64521)) 
+print(smallest_number_from_odds(None)) 
+print(smallest_number_from_odds('')) 
+print(smallest_number_from_odds(2468)) 
+print(smallest_number_from_odds(-8679)) 
+print(smallest_number_from_odds(0)) 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+2) [Set 1] Given a mapping between book titles and the themes they contain, find the theme 
+which appears the most times. If multiple themes appear the same number of times, return any 
+one of them. 
+
+def most_common_theme(book_themes: Dict[str, List[str]]) -> Optional[str]: 
+    max_count = 0 
+    res = None 
+    tracker_count = {} 
+    for key in book_themes: 
+        for item in book_themes[key]: 
+            if item not in tracker_count: 
+                tracker_count[item] = 1 
+                 Max_count = 1 
+                 res = item 
+            else: 
+                tracker_count[item] += 1 
+           if tracker_count[item] > max_count: 
+                 max_count = tracker_count[item] 
+                 res = item 
+
+    return res 
+Time Complexity: O(n), where n is the total number of themes across all books. 
+Space Complexity: O(k), where k is the number of unique themes. 
+
+assert most_common_theme({ 
+    "1984":            ["dystopia", "politics"], 
+    "Brave New World": ["dystopia", "science"], 
+    "Fahrenheit 451":  ["dystopia"], 
+}) == "dystopia" 
+tie_mapping = { 
+    "Book A": ["magic"], 
+    "Book B": ["science"], 
+    "Book C": ["magic"], 
+    "Book D": ["science"], 
+} 
+assert most_common_theme(tie_mapping) in {"magic", "science"} 
+assert most_common_theme({}) is None 
+assert most_common_theme({ 
+    "Book A": [], 
+    "Book B": ["perseverance"], 
+    "Book C": [], 
+}) == "perseverance" 
+assert most_common_theme({ 
+    "Book A": [], 
+
+ 
+ 
+                 
+ 
+    "Book B": [], 
+}) is None 
+assert most_common_theme(None) is None 
+assert most_common_theme({"The Alchemist": ["journey"]}) == "journey" 
+assert most_common_theme({ 
+    "Book A": ["Love", "love"], 
+    "Book B": ["Love"], 
+}) == "Love" 
+assert most_common_theme({ 
+    "Book A": ["war", "war", "peace"], 
+    "Book B": ["peace"], 
+}) == "war" 
+print("Passed") 
+
+[Set 2] What is the most common unique comment across all locations in the comments 
+dictionary? 
+
+from collections import Counter 
+comments = { 
+  "Blue Hill": ["Cozy Atmosphere", "Curated Selection", "Too busy", "Cozy Atmosphere"], 
+  "Apple Road": ["Good Parking", "Sweet and Delicious", "Perfect for rainy Days"], 
+  "Orange Avenue": ["Cozy Atmosphere", "Large Bike Storage", "Curated Selection", "Curated 
+Selection"] 
+ } 
+
+Approach 1: 
+
+def most_common_comment(comments): 
+    if not comments:   
+        return None   
+
+    unique_comments = [] 
+    for location in comments: 
+        unique_comments.extend(set(comments[location]))  # Extract unique comments per 
+location 
+
+    count_comment = {} 
+    for comment in unique_comments:   
+        count_comment[comment] = count_comment.get(comment, 0) + 1  # Manually count 
+occurrences 
+
+    if not count_comment:   
+        return None   
+
+ 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+    max_count = 0 
+    most_common = None 
+
+    for comment, count in count_comment.items():   
+        if count > max_count:   
+            max_count = count 
+            most_common = comment   
+
+    return most_common 
+
+Approach 2:  
+
+def most_common_comment(comments): 
+    unique_comments = []  # list to store unique comments from each location 
+    for location in comments:  # loop through each location 
+        unique_comments.extend(set(comments[location]))  # add unique comments from each 
+location to the list 
+    comment_counter = Counter(unique_comments)  # count the occurrences of each comment 
+    most_common = comment_counter.most_common(1)  # get the most common comment 
+    return most_common[0][0] if most_common else None  # return the most common comment 
+
+Test Cases: 
+print(most_common_comment(comments)) 
+print(most_common_comment(None)) 
+print(most_common_comment({})) 
+print(most_common_comment({"loc1" : [], "loc2": []})) 
+print(most_common_comment({ 
+  "Blue Hill": ["Too busy"], 
+  "Apple Road": ["Good Parking", "Good Parking", "Too busy"], 
+  "Orange Avenue": ["Too busy", "Large Bike Storage", "Curated Selection", "Curated Selection"] 
+ })) 
+
+3) [Set 1] Given a list of meetings with the hours they started and ended at (as:  numbers from 
+1-to-24), and the size of their audience, return the largest total number of people that attended 
+meetings simultaneously, across a continuous period of: time. 
+
+from typing import List 
+
+def largest_number_of_people(meetings: List[Meeting]) -> int: 
+    # Initialize a dictionary to track the total audience at each hour 
+    time_limit = {i: 0 for i in range(1, 25)} 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+     
+    # Iterate through each meeting 
+    for item in meetings: 
+        start_time = item.start 
+        end_time = item.end 
+
+        # Increment the audience count for each hour the meeting is scheduled 
+        for i in range(start_time, end_time + 1): 
+            time_limit[i] += item.audience 
+
+    # Find the maximum audience count across all hours 
+    max_value = max(time_limit.values()) 
+
+    return max_value 
+
+[Set 2] The bookstore hosts a set of yearly workshops. 
+Each workshop repeats the same classes-each year. 
+Given a  list-of-workshops,  return-the-largest number of classes that were hosted in total across 
+any 2 consecutive-years. 
+
+Example:   
+[Workshop(name = "Intro to archival science", classes per year = 4, Start = 2000，end = 2003), 
+ Workshop(name = "Bind your own book", classes per year = 1, start =  2001, end = 2004), 
+ Workshop(name = "Monthly discussion circle", classes per year = 12, start = 2004, end=2006), 
+
+Result:  25  
+
+Explanation:  The largest  number of classes across 2 consecutive years were hosted between  
+2004 (13-classes)  and  2005 (12 classes) when the last two workshops were taking place at the 
+same time. 
+
+from typing import List 
+from dataclasses import dataclass 
+
+@dataclass 
+class Workshop: 
+    name: str 
+    classes_per_year: int 
+    start: int  
+    end: int 
+
+def largest_number_of_classes(workshops: List[Workshop]) -> int: 
+    # ------------------------------------------------------------------ 
+    # 1) Build the year → total-classes map 
+    # ------------------------------------------------------------------ 
+
+ 
+         
+     
+     
+  
+ 
+ 
+ 
+ 
+ 
+ 
+    year_classes = {}                         # {year: total classes} 
+
+    for workshop in workshops: 
+        for year in range(workshop.start, workshop.end + 1): 
+            if year in year_classes: 
+                year_classes[year] += workshop.classes_per_year 
+            else: 
+                year_classes[year] = workshop.classes_per_year 
+
+    # ------------------------------------------------------------------ 
+    # 2) Fill the gaps: make sure every year between min and max exists 
+    # ------------------------------------------------------------------ 
+    if year_classes:                          # avoid min()/max() on empty dict 
+        first_year = min(year_classes)        # earliest year we saw 
+        last_year  = max(year_classes)        # latest  year we saw 
+
+        for yr in range(first_year, last_year + 1): 
+            if yr not in year_classes:        # impute missing year with 0 
+                year_classes[yr] = 0 
+
+    # ------------------------------------------------------------------ 
+    # 3) Scan consecutive pairs and keep the best sum 
+    # ------------------------------------------------------------------ 
+    max_classes = 0 
+    years = sorted(year_classes.keys())       # now a *continuous* list 
+
+    for i in range(len(years) - 1): 
+        if years[i + 1] - years[i] == 1:      # guaranteed true after filling, but kept for clarity 
+            current_two_years = (year_classes[years[i]] + 
+                                 year_classes[years[i + 1]]) 
+            if current_two_years > max_classes: 
+                max_classes = current_two_years 
+
+    return max_classes 
+
+4) Find uncommon elements between two lists. 
+You are given two lists, and you need to find elements that are in one list but not the 
+other. The result should not contain any duplicates, and only elements that are unique to 
+either of the two lists should be returned. 
+# Test cases assert(find_uncommon_elements([], []) == []) assert(find_uncommon_elements([1, 
+2, 3], [4, 5, 6]) == [1, 2, 3, 4, 5, 6]) assert(find_uncommon_elements([1, 2, 2, 3], [3, 3, 4]) == [1, 
+2, 4]) assert(find_uncommon_elements([1, 2, 3], [1, 2, 3]) == []) 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+assert(find_uncommon_elements([1, -2, 3], [-1, 2, 3]) == [1, -2, -1]) 
+assert(find_uncommon_elements(["apple", "banana"], ["banana", "cherry"]) == ["apple", 
+"cherry"]) assert(find_uncommon_elements([10, 20, 30], [30, 40, 50]) == [10, 20, 40, 50]) 
+
+Set 3 : 
+### Table "books" 
+| Column            | Type           | 
+|-------------------|----------------| 
+| id                | INTEGER (KEY)  | 
+| title             | VARCHAR        | 
+| author_id         | INTEGER        | 
+| publication_date  | DATE           | 
+| genre             | VARCHAR        | 
+| price             | DOUBLE PRECISION| 
+
+### Table "authors" 
+| Column      | Type           | 
+|-------------|----------------| 
+| id          | INTEGER (KEY)  | 
+| first_name  | VARCHAR        | 
+| last_name   | VARCHAR        | 
+| birthday    | DATE           | 
+
+### Table "sales" 
+| Column            | Type           | 
+|-------------------|----------------| 
+| id                | INTEGER (KEY)  | 
+| book_id           | INTEGER        | 
+| customer_id       | INTEGER        | 
+| amount            | NUMERIC        | 
+| transaction_date  | DATE           | 
+| refunded          | BOOLEAN        | 
+
+### Table "customers" 
+| Column            | Type           | 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+|-------------------|----------------| 
+| id                | INTEGER (KEY)  | 
+| first_name        | VARCHAR        | 
+| last_name         | VARCHAR        | 
+| registration_date | DATE           | 
+| genre_interests   | VARCHAR[]        | 
+| is_rewards_member | BOOLEAN        | 
+
+1) Find the author_id’s who published at least 5 genres. Give me the id’s in the order of genres 
+
+Expected Output :  
+author_id | genres 
+—------------------------------- 
+
+41| 5 
+81| 5 
+21| 6 
+
+SELECT author_id,  
+COUNT(DISTINCT b.genre) genres 
+FROM books  
+GROUP BY author_id 
+HAVING COUNT(DISTINCT b.genre) >= 5 
+ORDER BY genres 
+
+2) What percent of sales occurred on the same day that the customer 
+registered? 
+Expected output: 
+pct_sales_on_reg_day 
+—-------------------------- 
+6.1435353253281206 
+
+Approach 1 (preferred): When there is a sale and no customer associated and we need to 
+track it in denominator. Use the left join to include such data. 
+ SELECT ( 
+(SUM( CASE WHEN s.transaction_date = c.registration_date THEN  1 ELSE 0 END) * 
+100.0) / 
+ (COUNT( s.id))  as pct_sales_on_reg_day 
+FROM sales s JOIN customers c on s.customer_id = c.id 
+
+Approach 2 : (avoid this due to multiple scans on sales table) 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+SELECT ((COUNT(DISTINCT s.id) * 100.0) / (SELECT COUNT(DISTINCT s.id) FROM sales))  
+as pct_sales_on_reg_day 
+FROM sales s JOIN customers c on s.customer_id = c.id 
+WHERE s.transaction_date = c.registration_date 
+
+3)  Find customers who shopped on more than 1 day and who bought more than 3 books on the 
+first and last days of shopping combined. 
+
+Sample Output :  
+customer_id | transactions_count 
+|-------------------|----------------| 
+
+72        | 6 
+306      | 5 
+387      | 4 
+450      | 4 
+| 4 
+499  
+
+Approach 1 (with CTE’s) : 
+WITH min_max_dt as( 
+SELECT customer_id, MIN(transaction_date) as min_dt, MAX(transaction_date) as 
+max_dt 
+FROM sales s 
+GROUP BY customer_id 
+HAVING COUNT(DISTINCT transaction_date) > 1) 
+
+SELECT customer_id, COUNT(book_id) as transactions_count 
+FROM sales s JOIN min_max_dt m ON s.customer_id = m.customer_id 
+WHERE (s.transaction_date = m.min_dt  
+            Or s.transaction_date = m.max_dt) 
+GROUP BY customer_id 
+HAVING COUNT(book_id) > 3 
+ORDER BY transactions_count desc 
+
+Approach 2 (without CTE’s) : 
+
+SELECT customer_id, COUNT(book_id) as transactions_count 
+FROM sales s  
+JOIN  
+( SELECT customer_id, MIN(transaction_date) as min_dt, MAX(transaction_date) as 
+max_dt 
+FROM sales s 
+GROUP BY customer_id 
+HAVING COUNT(DISTINCT transaction_date) > 1)m  
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ON s.customer_id = m.customer_id 
+WHERE (s.transaction_date = m.min_dt  
+            Or s.transaction_date = m.max_dt) 
+GROUP BY customer_id 
+HAVING COUNT(book_id) > 3 
+ORDER BY transactions_count desc 
+
+Followup: If they ask how would you do it without using either CTE’s or sub queries you 
+can say - I will use the window functions, and avoid ctes as much as possible 
+
+Approach 3 (Only for reference - don’t use this approach for solution): 
+
+SELECT customer_id 
+FROM ( 
+  SELECT  
+    customer_id, 
+    transaction_date, 
+    COUNT(*) AS daily_books, 
+    MIN(transaction_date) OVER (PARTITION BY customer_id) AS first_day, 
+    MAX(transaction_date) OVER (PARTITION BY customer_id) AS last_day 
+  FROM sales 
+  GROUP BY customer_id, transaction_date 
+) AS sub 
+WHERE transaction_date IN (first_day, last_day) 
+GROUP BY customer_id 
+HAVING COUNT(DISTINCT transaction_date) > 1 
+   AND SUM(daily_books) > 3; 
+
+4) "Hints: 
+to convert lists into rows, 
+use CROSS, JOIN UNNEST() 
+
+Question: What percent of 
+customers have a genre interest from which they have not 
+yet purchased a book 
+
+Expected Output: 
+percent_not_bought_interested_genre 
+74.0932642487046632   
+
+WITH customer_interest_genre as (  
+SELECT id, UNNEST( genre_interest) AS genre_interests   
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+FROM customers), 
+
+customer_purchased_genre as (  
+SELECT DISTINCT s.customer_id, b.genre 
+FROM sales s JOIN books b on s.book_id = b.id) 
+
+SELECT (CASE WHEN cpg.customer_id IS NULL THEN cig.id * 100.0) /  
+           (SELECT COUNT(DISTINCT id) from customer_interest_genre ci))  
+           as percent_not_bought_interested_genre 
+From customer_interest_genre cig  
+left join customer_purchased_genre cpg  
+      on cig.id = cpg.customer_id  
+      and cig.genre_interests = cpg.genre 
+
+### Question 1: 
+Given a list of book prices, find the average price of a book. 
+
+```python 
+def avg_book_price(prices): 
+    # Code here 
+    return avg_price 
+
+def float_eq(a, b): 
+    return abs(a - b) < 0.00000001 
+
+assert(avg_book_price(None) is None) 
+assert(avg_book_price([]) == 0) 
+assert(float_eq(avg_book_price([9.99]), 9.99) is True) 
+assert(float_eq(avg_book_price([9.99, 20.99]), 15.49) is True) 
+assert(float_eq(avg_book_price([9.99]), 9.99) is True) 
+assert(float_eq(avg_book_price([0.0, 0.00000000001, 9.99, 20.99]), 7.745) is True) 
+``` 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+### Question 2: 
+Given a list of book titles, find all editions of the same book. The edition of a book has the full 
+title of the original book as a prefix in its title. 
+Example: original book title is "Green Trees", editions can be titled as "Green Trees Revised", 
+"Green Trees Online Edition", "Green Trees for Dummies", etc. 
+
+```python 
+from typing import List 
+
+def find_editions(books: List[str]) -> List[str]: 
+    # Code here 
+    return editions 
+
+assert(find_editions(["Green Trees", "Python in a Nutshell"]) == []) 
+assert(sorted(find_editions(["Green Trees", "Green Trees Second Edition", "Python in a 
+Nutshell", "Python for Dummies", "Python"])) == sorted(['Python in a Nutshell', 'Python for 
+Dummies', 'Green Trees Second Edition'])) 
+assert(find_editions(["Python", "All About Pythons"]) == []) 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+print("all tests passed") 
+
+Approach 1 (Two Pointer): 
+from typing import List 
+
+def find_editions(books: List[str]) -> List[str]: 
+    if not books: 
+        return [] 
+
+    # ❶ Sort once → enables linear prefix grouping 
+    books_sorted = sorted(books) 
+
+    n = len(books_sorted) 
+    editions: List[str] = [] 
+    i = 0                                    # left pointer – start of current block 
+
+    while i < n: 
+        original = books_sorted[i] 
+        j = i + 1                            # right pointer – scans possible editions 
+
+        # ❷ Collect consecutive strings that start with "original + space" 
+        prefix = original + " " 
+        while j < n and books_sorted[j].startswith(prefix): 
+            editions.append(books_sorted[j]) 
+            j += 1 
+
+        # ❸ Move left pointer to the next potential original 
+        i = j                                # skip over the block just processed 
+
+    return editions 
+
+Approach 2 : 
+
+def find_editions_naive(books): 
+    editions = [] 
+    for original in books: 
+        prefix = original + " " 
+        for candidate in books: 
+            if candidate != original and candidate.startswith(prefix): 
+                editions.append(candidate) 
+    # remove potential duplicates 
+    return list(dict.fromkeys(editions)) 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ 
+ 
+### Question 3: 
+Given a list of book prices and a budget, find the maximum number of books that can be bought 
+without exceeding the budget. 
+
+```python 
+from typing import List 
+
+def max_book_count(books: List[float], budget: float) -> int: 
+    # Code here 
+    return max_books 
+
+assert(max_book_count([1], 0.0) == 0) 
+assert(max_book_count([20.99, 9.99, 35.0], 30.0) == 1) 
+assert(max_book_count([9.99, 20.99, 10.99, 10.0], 10.0) == 1) 
+assert(max_book_count([15.49, 20.99, 9.99, 5.0], 0.0) == 0) 
+assert(max_book_count([14.99, 20.99, 4.99, 9.99, 15.0], 20.0) == 2) 
+``` 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+### Question 4: 
+Given two lists `bookshelf_sizes` and `bookshelf_titles`, check if each bookshelf title can fit into 
+one of the given shelf sizes. A title fits into a shelf if the number of characters in the title is less 
+than or equal to the size. Return `True` if all titles fit, otherwise `False`. 
+
+```python 
+from typing import List 
+
+def can_fit_books(bookshelf_sizes: List[int], bookshelf_titles: List[str]) -> bool: 
+    # Code here 
+    return True 
+
+assert can_fit_books([7, 9, 6], ['education', 'novel', 'fiction']) == True 
+assert can_fit_books([7, 9, 4], ['education', 'novel', 'fiction']) == False 
+assert can_fit_books([6, 4], ['fantasy', 'science', 'romance']) == False 
+assert can_fit_books([7, 8, 9, 5], ['mystery', 'classic']) == True 
+
+print("all tests passed") 
+``` 
+
+Explanation: 
+- If there are more titles than sizes, return `False`. 
+- If all titles can fit into the shelf sizes based on character length, return `True`. 
+
+### Sample Use Cases: 
+
+1. **Input**: `bookshelf_sizes = [7, 9, 6]`, `bookshelf_titles = ['education', 'novel', 'fiction']`   
+   **Output**: `True`   
+   **Explanation**: Each title fits within the respective shelf size. 
+
+2. **Input**: `bookshelf_sizes = [7, 9, 4]`, `bookshelf_titles = ['education', 'novel', 'fiction']`   
+   **Output**: `False`   
+   **Explanation**: 'novel' (5 characters) cannot fit in size 4. 
+
+3. **Input**: `bookshelf_sizes = [6, 4]`, `bookshelf_titles = ['fantasy', 'science', 'romance']`   
+   **Output**: `False`   
+   **Explanation**: Not enough sizes for all titles. 
+
+4. **Input**: `bookshelf_sizes = [7, 8, 9, 5]`, `bookshelf_titles = ['mystery', 'classic']`   
+   **Output**: `True`   
+   **Explanation**: All titles fit with extra shelf sizes left. 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Solution: 
+from typing import List 
+
+def can_fit_books(bookshelf_sizes: List[int], bookshelf_titles: List[str]) -> bool: 
+    """ 
+    Determines if all book titles can fit into the given bookshelf sizes. 
+
+    Args: 
+    bookshelf_sizes (List[int]): A list of available bookshelf slot sizes. 
+    bookshelf_titles (List[str]): A list of book titles. 
+
+    Returns: 
+    bool: True if all books can fit, otherwise False. 
+    """ 
+    # Ensure there are enough slots for all titles 
+    if len(bookshelf_titles) > len(bookshelf_sizes): 
+        return False 
+
+    # Sort bookshelf sizes in ascending order 
+    bookshelf_sizes.sort(reverse=True) 
+
+    # Sort book titles by length in ascending order 
+    bookshelf_titles.sort(key=len, reverse=True) 
+
+    # Try to fit each book into a shelf 
+    for i in range(len(bookshelf_titles)): 
+        if len(bookshelf_titles[i]) > bookshelf_sizes[i]: 
+            return False  # If a title doesn't fit, return False 
+
+    return True  # All books fit successfully 
+
+# Test cases 
+assert can_fit_books([7, 9, 6], ['education', 'novel', 'fiction']) == True 
+assert can_fit_books([7, 9, 4], ['education', 'novel', 'fiction']) == False 
+assert can_fit_books([6, 4], ['fantasy', 'science', 'romance']) == False 
+assert can_fit_books([7, 8, 9, 5], ['mystery', 'classic']) == True 
+assert can_fit_books([10], ['encyclopedia']) == False 
+assert can_fit_books([4], ['note']) == True 
+assert can_fit_books([4], ['notes']) == False 
+assert can_fit_books([3, 4, 5], ['a', 'bc', 'def']) == True 
+assert can_fit_books([2, 2], ['aa', 'bbb']) == False 
+assert can_fit_books([8, 5, 3, 10], ['longest', 'tiny', 'mid']) == True 
+assert can_fit_books([5, 5, 5], ['a', 'bb', 'ccc', 'dddd']) == False 
+assert can_fit_books([3, 4, 5], []) == True  # Edge case: no books, should return True 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+assert can_fit_books([], ['book']) == False  # Edge case: no shelves, should return False 
+
+print("All test cases passed!") 
+
+Question 4 - Version 2: 
+
+""" 
+Problem: 
+--------- 
+Given a list of tuples where each tuple represents a book as (price, sales_count), 
+write a function to return the nth most sold book. The ranking is based on: 
+  - Primary sort: descending by sales count. 
+  - Secondary sort (tie-breaker): ascending by book price(question version 1), descending book 
+price(question version 2) 
+
+The function should accept an integer n (1-indexed) and return the nth most sold 
+book as a tuple (price, sales_count). If the list is empty or if n is invalid (<= 0 or 
+greater than the number of books), the function should return None. 
+
+Example: 
+--------- 
+Input: 
+    books = [ 
+        (20.99, 5), 
+        (15.99, 7), 
+        (30.50, 5), 
+        (10.99, 3), 
+        (25.00, 7) 
+    ] 
+    n = 1 
+
+Expected Output: (version 1) 
+    (15.99, 7)  
+
+Explanation: 
+The books should be ranked as follows: 
+  1. (15.99, 7)   - 7 sales, lower price than (25.00, 7) 
+  2. (25.00, 7)   - 7 sales 
+  3. (20.99, 5)   - 5 sales, lower price than (30.50, 5) 
+  4. (30.50, 5)   - 5 sales 
+  5. (10.99, 3)   - 3 sales 
+Thus, the 1st most sold book is (15.99, 7). 
+""" 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Expected Output: (version 2) 
+   (25.00, 7) 
+
+Explanation: 
+The books should be ranked as follows: 
+  1. (15.99, 7)   - 7 sales 
+  2. (25.00, 7)   - 7 sales, higher price than (15.99, 7) 
+  3. (20.99, 5)   - 5 sales, 
+  4. (30.50, 5)   - 5 sales,  higher price than (20.99, 5) 
+  5. (10.99, 3)   - 3 sales 
+Thus, the 1st most sold book is (25.00, 7). 
+""" 
+
+Version 1 solution: 
+
+def get_nth_most_sold_book(books_data, n): 
+    """ 
+    Returns the nth most sold book as a tuple (price, sales_count) 
+    from the list 'books_data' using the following criteria: 
+      - Primary sort: descending by sales count. 
+      - Secondary sort (tie-breaker): ascending by book price. 
+
+    Parameters: 
+        books_data (list of tuples): Each tuple is (price, sales_count). 
+        n (int): 1-indexed ranking of the desired book. 
+
+    Returns: 
+        tuple or None: The nth most sold book tuple or None if input is invalid. 
+    """ 
+    # Edge case: if the list is empty, return None. 
+    if not books_data: 
+        return None 
+
+    # Validate n: it should be a positive integer and not exceed the number of items. 
+    if n <= 0 or n > len(books_data): 
+        return None 
+
+    # Sort the list: 
+    # - First, sort by sales count in descending order (-x[1]). 
+    # - Then, in case of a tie, sort by book price in ascending order (x[0]). 
+    sorted_books = sorted(books_data, key=lambda x: (-x[1], x[0])) 
+
+    # Return the nth most sold book (n is 1-indexed). 
+    return sorted_books[n-1] 
+
+if __name__ == "__main__": 
+    # Test Cases: 
+
+    # Normal test data 
+
+ 
+ 
+ 
+ 
+     
+     
+     
+ 
+ 
+ 
+     
+    books = [ 
+        (20.99, 5),    # Book A 
+        (15.99, 7),    # Book B 
+        (30.50, 5),    # Book C 
+        (10.99, 3),    # Book D 
+        (25.00, 7)     # Book E 
+    ] 
+    # Expected sorted order: 
+    # 1. (15.99, 7)   - 7 sales, lower price than (25.00, 7) 
+    # 2. (25.00, 7)   - 7 sales 
+    # 3. (20.99, 5)   - 5 sales, lower price than (30.50, 5) 
+    # 4. (30.50, 5)   - 5 sales 
+    # 5. (10.99, 3)   - 3 sales 
+
+    print("Test Case 1 (n=1):", get_nth_most_sold_book(books, 1))  # Expected output: (15.99, 7) 
+    print("Test Case 2 (n=2):", get_nth_most_sold_book(books, 2))  # Expected output: (25.00, 7) 
+    print("Test Case 3 (n=3):", get_nth_most_sold_book(books, 3))  # Expected output: (20.99, 5) 
+    print("Test Case 4 (n=5):", get_nth_most_sold_book(books, 5))  # Expected output: (10.99, 3) 
+
+    # Edge case 1: n is zero (invalid) 
+    print("Edge Case 1 (n=0):", get_nth_most_sold_book(books, 0))  # Expected output: None 
+
+    # Edge case 2: n is greater than the list length (invalid) 
+    print("Edge Case 2 (n=10):", get_nth_most_sold_book(books, 10))  # Expected output: None 
+
+    # Edge case 3: empty list of books 
+    print("Edge Case 3 (empty list):", get_nth_most_sold_book([], 1))  # Expected output: None 
+
+Version 2 solution: 
+
+def get_nth_most_sold_book(books_data, n): 
+    """ 
+    Returns the nth most sold book as a tuple (price, sales_count) 
+    from the list 'books_data' using the following criteria: 
+      - Primary sort: descending by sales count. 
+      - Secondary sort (tie-breaker): descending by book price. 
+
+    Parameters: 
+        books_data (list of tuples): Each tuple is (price, sales_count). 
+        n (int): 1-indexed ranking of the desired book. 
+
+    Returns: 
+        tuple or None: The nth most sold book tuple or None if input is invalid. 
+    """ 
+    # Edge case: if the list is empty, return None. 
+    if not books_data: 
+        return None 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+     
+     
+    # Validate n: it should be a positive integer and not exceed the number of items. 
+    if n <= 0 or n > len(books_data): 
+        return None 
+
+    # Sort the list using reverse=True instead of negative values 
+    sorted_books = sorted(books_data, key=lambda x: (x[1], x[0]), reverse=True) 
+
+    # Return the nth most sold book (n is 1-indexed). 
+    return sorted_books[n-1] 
+
+if __name__ == "__main__": 
+    # Test Cases: 
+
+    # Normal test data 
+    books = [ 
+        (20.99, 5),    # Book A 
+        (15.99, 7),    # Book B 
+        (30.50, 5),    # Book C 
+        (10.99, 3),    # Book D 
+        (25.00, 7)     # Book E 
+    ] 
+    # Expected sorted order (by new criteria): 
+    # 1. (25.00, 7)   - 7 sales, higher price than (15.99, 7) 
+    # 2. (15.99, 7)   - 7 sales 
+    # 3. (30.50, 5)   - 5 sales, higher price than (20.99, 5) 
+    # 4. (20.99, 5)   - 5 sales 
+    # 5. (10.99, 3)   - 3 sales 
+
+    print("Test Case 1 (n=1):", get_nth_most_sold_book(books, 1))  # Expected output: (25.00, 7) 
+    print("Test Case 2 (n=2):", get_nth_most_sold_book(books, 2))  # Expected output: (15.99, 7) 
+    print("Test Case 3 (n=3):", get_nth_most_sold_book(books, 3))  # Expected output: (30.50, 5) 
+    print("Test Case 4 (n=4):", get_nth_most_sold_book(books, 4))  # Expected output: (20.99, 5) 
+    print("Test Case 5 (n=5):", get_nth_most_sold_book(books, 5))  # Expected output: (10.99, 3) 
+
+    # Edge case: n is zero (invalid) 
+    print("Edge Case 1 (n=0):", get_nth_most_sold_book(books, 0))  # Expected output: None 
+
+    # Edge case: n is greater than the list length (invalid) 
+    print("Edge Case 2 (n=10):", get_nth_most_sold_book(books, 10))  # Expected output: None 
+
+    # Edge case: empty list of books 
+    print("Edge Case 3 (empty list):", get_nth_most_sold_book([], 1))  # Expected output: None 
+
+Additional Python Questions 
+
+#### Question 1 
+
+ 
+     
+ 
+ 
+ 
+     
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Given an unsorted array of integers, write a function to find the first missing positive integer. 
+
+Solution: 
+from typing import List 
+
+def first_missing_positive(nums: List[int]) -> int: 
+    n = len(nums) 
+
+    # First step is to mark numbers (num < 0) and (num > n) with a special marker number 
+(n+1) 
+    # (we can ignore those because the missing positive integer must be in the range 1 to 
+n+1) 
+    for i in range(n): 
+        if nums[i] <= 0 or nums[i] > n: 
+            nums[i] = n + 1 
+
+    # Second step is to use the index as a hash key and the number sign as a presence 
+detector 
+    for i in range(n): 
+        num = abs(nums[i]) 
+        if num <= n: 
+            nums[num - 1] = -abs(nums[num - 1]) 
+
+    # Third step is to find the first cell which isn't negative (i.e. has a positive value) 
+    for i in range(n): 
+        if nums[i] > 0: 
+            return i + 1 
+
+    return n + 1 
+
+# Example Usage 
+print(first_missing_positive([3, 4, -1, 1]))  # Output: 2 
+print(first_missing_positive([1, 2, 0]))      # Output: 3 
+
+Time Complexity: O(n) 
+Space Complexity: O(1) 
+
+#### Question 2 
+
+Given a string of words separated by spaces, write a function to find the average word length. 
+
+Solution: 
+ def average_word_length(paragraph: str) -> float: 
+
+ 
+ 
+ 
+ 
+     
+     
+     
+     
+ 
+ 
+ 
+ 
+ 
+    words = paragraph.split() 
+    if not words: 
+        return 0.0 
+
+    total_length = sum(len(word) for word in words) 
+    average_length = total_length / len(words) 
+
+    return average_length 
+
+# Example Usage 
+print(average_word_length("This is a simple paragraph with some words."))  # Output: 
+4.333333333333333 
+print(average_word_length("Calculate the average word length."))           # Output: 5.0 
+
+Time Complexity: O(n), where n is the total number of characters in the paragraph. 
+Space Complexity: O(w), where w is the number of words in the paragraph. 
+
+Set 4:  
+
+Meta Tech Screen Questions - Set 4 
+
+Set 4 - SQL and Python Questions 
+
+Please add this as the next continuation of the existing document. Practice all solutions in 
+multiple ways. Optimize wherever possible. Ensure you understand data model context 
+before jumping to answers. 
+
+SQL Questions (Based on Library Data Model) 
+
+Data Model: 
+
+Table "copies" 
+Column.                 Type 
+copy_id               INTEGER (KEY) 
+book_id               INTEGER 
+condition             VARCHAR 
+source                VARCHAR 
+price_at_purchase     DOUBLE 
+reserved_by_member_id INTEGER 
+
+Table "books" 
+
+ 
+     
+     
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Column            Type 
+book_id          INTEGER (KEY) 
+author_id        INTEGER 
+title            VARCHAR 
+category         VARCHAR 
+page_count       INTEGER 
+
+Table "authors" 
+Column             Type 
+author_id         INTEGER (KEY) 
+first_name        VARCHAR 
+last_name         VARCHAR 
+birthday          DATE 
+photo_url         VARCHAR 
+
+Table "checkouts" 
+Column              Type 
+checkout_id         INTEGER (KEY) 
+copy_id             INTEGER 
+member_id           INTEGER 
+checkout_date       DATE 
+due_date            DATE 
+returned_date       DATE 
+renewal_count       INTEGER 
+late_fee            DOUBLE 
+
+Table "members" 
+Column                  Type 
+member_id               INTEGER (KEY) 
+invited_by_member_id    INTEGER 
+registration_date       DATE 
+registration_fee        DOUBLE 
+last_visit_date         DATE 
+membership_type         VARCHAR 
+
+Q1) How many book copies are in "good"  condition and have not been returned? 
+
+What percentage of the book copies from the previous sentence have been renewed 
+more than 2 times (during their current checkout)? 
+Expected columns: num_copies not_returned (INT), pct_renewed (DOUBLE) 
+
+Approach 1 (Standard Join + Filter): 
+
+SELECT  
+    COUNT(*) AS num_copies_not_returned, 
+    100.0 * SUM(CASE WHEN c.renewal_count > 2 THEN 1 ELSE 0 END) / COUNT(*) AS pct_renewed 
+FROM  
+
+ 
+ 
+ 
+ 
+ 
+ 
+    copies cp 
+JOIN  
+    checkouts c ON cp.copy_id = c.copy_id 
+WHERE  
+    cp.condition = 'good' 
+    AND c.returned_date IS NULL; 
+
+Approach 2 (Use CTE to isolate filtered checkouts first): 
+
+WITH valid_checkouts AS ( 
+  SELECT * 
+  FROM copies cp 
+  JOIN checkouts c ON cp.copy_id = c.copy_id 
+  WHERE cp.condition = 'good' AND c.returned_date IS NULL 
+) 
+SELECT 
+  COUNT(*) AS num_copies_not_returned, 
+  ROUND( 
+    100.0 * SUM(CASE WHEN renewal_count > 2 THEN 1 ELSE 0 END) / COUNT(*), 
+    2 
+  ) AS pct_renewed 
+FROM valid_checkouts; 
+
+Q2) The "lifetime value" of a book is defined as the total number of days it was checked 
+out. Note that  checkouts which have not yet been  returned don't count towards the 
+"lifetime value". 
+
+What are the top 3 books with the highest "lifetime value" that have moré than 10 copies? 
+Expected columns: book _id (INT), lifetime_value  (INT) 
+
+Approach (Using CTEs): 
+
+WITH copy_counts AS ( 
+    SELECT book_id, COUNT(*) AS num_copies 
+    FROM copies 
+    GROUP BY book_id 
+    HAVING COUNT(*) > 10 
+), 
+book_lifetime AS ( 
+    SELECT 
+        cp.book_id, 
+        SUM(c.returned_date - c.checkout_date) AS lifetime_value 
+    FROM 
+        checkouts c 
+    JOIN copies cp ON c.copy_id = cp.copy_id 
+
+ 
+ 
+ 
+ 
+ 
+    WHERE 
+        c.returned_date IS NOT NULL 
+    GROUP BY 
+        cp.book_id 
+) 
+SELECT 
+    b.book_id, 
+    b.lifetime_value 
+FROM 
+    book_lifetime b 
+JOIN copy_counts cc ON b.book_id = cc.book_id 
+ORDER BY 
+    b.lifetime_value DESC 
+LIMIT 3; 
+
+Q3) Members can reserve book copies  so they are next in line to check them out. 
+Find the member with the largest absolute difference in the number of reserved book 
+copies  between themselves  and the  member  that invited them to the library. Include 
+members with  0 reserved books. 
+Expected Columns : 
+member_id, invited_by_member_id, diff_num_reserved_copies 
+
+Approach 1 (Self join with COALESCE): 
+
+WITH reserved_counts AS ( 
+    SELECT  
+        m.member_id, 
+        m.invited_by_member_id, 
+        COUNT(c.copy_id) AS reserved_count 
+    FROM  
+        members m 
+    LEFT JOIN copies c ON m.member_id = c.reserved_by_member_id 
+    GROUP BY  
+        m.member_id, m.invited_by_member_id 
+), 
+with_inviter_reserved AS ( 
+    SELECT  
+        rc1.member_id, 
+        rc1.invited_by_member_id, 
+        rc1.reserved_count AS member_reserved, 
+        COALESCE(rc2.reserved_count, 0) AS inviter_reserved, 
+        ABS(rc1.reserved_count - COALESCE(rc2.reserved_count, 0)) AS diff_num_reserved_copies 
+    FROM  
+        reserved_counts rc1 
+    LEFT JOIN reserved_counts rc2 ON rc1.invited_by_member_id = rc2.member_id 
+) 
+SELECT  
+
+ 
+ 
+  
+    member_id, 
+    invited_by_member_id, 
+    diff_num_reserved_copies 
+FROM  
+    with_inviter_reserved 
+ORDER BY  
+    diff_num_reserved_copies DESC 
+LIMIT 1; 
+
+Q4) Find members who checked out books in two full consecutive weeks in 2024. If 
+multiple such weeks, return the one with the highest number of copies checked out. 
+
+[Note: We are not sure about this question entirely, would highly recommend to prepare multiple 
+variations of this question using GPT] 
+
+Expected Output Columns: 
+
+●  member_id (INT) 
+
+●  week_1_start (DATE): start of the first week 
+
+●  copies_checked_out (INT): total number of books checked out across both weeks 
+
+Assumptions: 
+
+● 
+
+"Full week" means at least one checkout on each day from Monday to Sunday 
+
+●  Weeks are consecutive if week numbers differ by 1 (and are in the same year) 
+
+●  Use ISO week date functions for consistency 
+
+Approach 1 (use CTEs + group by year, week, and day): 
+
+WITH checkouts_2024 AS ( 
+    SELECT *, 
+           EXTRACT(WEEK FROM checkout_date) AS week_num, 
+           EXTRACT(DOW FROM checkout_date) AS day_of_week, 
+           DATE_TRUNC('week', checkout_date)::DATE AS week_start 
+    FROM checkouts 
+    WHERE EXTRACT(YEAR FROM checkout_date) = 2024 
+), 
+full_week_activity AS ( 
+    SELECT member_id, week_num, week_start, COUNT(DISTINCT day_of_week) AS active_days, 
+COUNT(*) AS total_copies 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+    FROM checkouts_2024 
+    GROUP BY member_id, week_num, week_start 
+    HAVING COUNT(DISTINCT day_of_week) = 7 
+), 
+consecutive_full_weeks AS ( 
+    SELECT  
+        fw1.member_id, 
+        fw1.week_start AS week_1_start, 
+        fw1.total_copies + fw2.total_copies AS copies_checked_out 
+    FROM full_week_activity fw1 
+    JOIN full_week_activity fw2 
+      ON fw1.member_id = fw2.member_id 
+     AND fw1.week_num + 1 = fw2.week_num 
+) 
+SELECT member_id, week_1_start, copies_checked_out 
+FROM ( 
+    SELECT *, 
+           ROW_NUMBER() OVER(PARTITION BY member_id ORDER BY copies_checked_out DESC) AS 
+rn 
+    FROM consecutive_full_weeks 
+) ranked 
+WHERE rn = 1; 
+
+Approach 2 (compact version using arrays for weekday validation): 
+
+WITH week_activity AS ( 
+  SELECT  
+    member_id, 
+    DATE_TRUNC('week', checkout_date)::DATE AS week_start, 
+    EXTRACT(WEEK FROM checkout_date) AS week_num, 
+    ARRAY_AGG(DISTINCT EXTRACT(DOW FROM checkout_date)) AS days, 
+    COUNT(*) AS cnt 
+  FROM checkouts 
+  WHERE EXTRACT(YEAR FROM checkout_date) = 2024 
+  GROUP BY member_id, week_start, week_num 
+), 
+valid_weeks AS ( 
+  SELECT * FROM week_activity WHERE ARRAY_LENGTH(days, 1) = 7 
+), 
+pairs AS ( 
+  SELECT  
+    a.member_id, 
+    a.week_start AS week_1_start, 
+    a.cnt + b.cnt AS copies_checked_out 
+  FROM valid_weeks a 
+  JOIN valid_weeks b  
+    ON a.member_id = b.member_id 
+   AND a.week_num + 1 = b.week_num 
+
+ 
+ 
+) 
+SELECT member_id, week_1_start, copies_checked_out 
+FROM ( 
+  SELECT *, ROW_NUMBER() OVER (PARTITION BY member_id ORDER BY copies_checked_out 
+DESC) AS rn 
+  FROM pairs 
+) x 
+WHERE rn = 1; 
+
+Python Questions 
+
+Q1) The library has a summer reading program where students read books to score 
+points. 
+
+Each book belongs to a category and is worth a number of points. 
+Students can score points from up to 3 books, but each book must belong to a different 
+category. 
+
+Given a list of books that a student read, calculate their maximum possible score. 
+
+Approach 1 (dictionary by category): 
+
+from typing import List, Tuple 
+
+def get_max_score(books: List[Tuple[str, int]]) -> int: 
+    category_best = {} 
+    for category, score in books: 
+        if category not in category_best or score > category_best[category]: 
+            category_best[category] = score 
+       else :  
+
+category_best[category] = max(category_best[category], score) 
+
+    return sum(sorted(category_best.values(), reverse=True)[:3]) 
+
+Approach 2 (group by category, sort + slice): 
+
+from typing import List, Tuple 
+
+def get_max_score(books: List[Tuple[str, int]]) -> int: 
+    scores_by_category = {} 
+    for cat, score in books: 
+        scores_by_category.setdefault(cat, []).append(score) 
+    top_scores = [max(v) for v in scores_by_category.values()] 
+    return sum(sorted(top_scores, reverse=True)[:3]) 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Test Cases: 
+
+test1 = [("Adventure",5), ("Adventure",2), ("History",3)] 
+assert(get_max_score(test1) == 8) 
+
+test2 = [("Adventure",4), ("History",3), ("Reference",1), ("Fiction",2)] 
+assert(get_max_score(test2) == 9) 
+
+test3 = [("Biography",2), ("Biography",4), ("Science",3), ("Science",1)] 
+assert(get_max_score(test3) == 7) 
+
+test4 = [] 
+assert(get_max_score(test4) == 0) 
+
+Q2) Every time a book is checked out or returned at the library, a log entry is created with 
+the ID of the book and a flag that is true for checkouts or false for returns. 
+
+Given an ordered list of log entries, write a function that returns false if: 
+
+* a book was checked out when it was already checked out 
+
+* a book was returned when it was not checked out. 
+
+Assume no books are checked out before the first log entry in the input. 
+
+Approach (set tracking): 
+
+from dataclasses import dataclass 
+
+@dataclass 
+class LogEntry: 
+    book_id: int 
+    is_checkout: bool 
+
+def are_log_entries_valid(log_entries: list[LogEntry]) -> bool: 
+    checked_out = set() 
+    for entry in log_entries: 
+        if entry.is_checkout: 
+            if entry.book_id in checked_out: 
+                return False 
+            checked_out.add(entry.book_id) 
+        else: 
+            if entry.book_id not in checked_out: 
+                return False 
+            checked_out.remove(entry.book_id) 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+    return True 
+
+Test Cases: 
+
+test_1 = [LogEntry(1, True), LogEntry(2, True), LogEntry(1, False), LogEntry(1, True)] 
+assert are_log_entries_valid(test_1) == True 
+
+test_2 = [LogEntry(1, True), LogEntry(2, True), LogEntry(1, True)] 
+assert are_log_entries_valid(test_2) == False 
+
+test_3 = [LogEntry(1, True), LogEntry(2, False), LogEntry(1, True)] 
+assert are_log_entries_valid(test_3) == False 
+
+test_4 = [LogEntry(1, True), LogEntry(2, True), LogEntry(1, False), LogEntry(2, False)] 
+assert are_log_entries_valid(test_4) == True 
+
+test_5 = [LogEntry(3, True), LogEntry(3, False), LogEntry(3, False)] 
+assert are_log_entries_valid(test_5) == False 
+
+print(“Passed”) 
+
+Q3) The Library has 4 locations. When a location is closed for the day, some employees 
+will work from a secondary location, while others will work from home. 
+
+The dictionary below shows, for each location, the number of employees who are 
+assigned to work there (e.g. 80 for office A), as well as how many will work from a 
+secondary location if theirs is closed (e.g. if A closes, then 10 people would go to office 
+B). 
+
+Given a set of closed locations, return a dictionary with the total number of employees 
+expected at each other location. 
+
+Approach 1 (base + reroute logic): 
+
+def get_num_employees(location_employees: dict[str, dict], closed_locations: set) -> dict: 
+    result = {} 
+    for location, info in location_employees.items(): 
+        if location not in closed_locations: 
+            result[location] = info.get(location, 0) 
+    if closed_locations: 
+        for closed in closed_locations: 
+            for target, count in location_employees[closed].items(): 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                if target not in closed_locations: 
+                    result[target] = result.get(target, 0) + count 
+     else : 
+        return result 
+    return result 
+
+Test Cases: 
+
+location_employees = { 
+    "A": {"A": 80, "B": 10, "C": 15, "D": 5}, 
+    "B": {"A": 5, "B": 120, "C": 10, "D": 0}, 
+    "C": {"A": 5, "B": 10, "C": 110, "D": 0}, 
+    "D": {"A": 5, "B": 0, "C": 10, "D": 240}, 
+} 
+
+assert get_num_employees(location_employees.copy(), set()) == { 
+    "A": 80, "B": 120, "C": 110, "D": 240 
+} 
+assert get_num_employees(location_employees.copy(), {"A"}) == { 
+    "B": 130, "C": 125, "D": 245 
+} 
+assert get_num_employees(location_employees.copy(), {"D", "C"}) == { 
+    "A": 90, "B": 130 
+} 
+assert get_num_employees(location_employees.copy(), {"A", "B", "C", "D"}) == {} 
+
+4) Given two words, source and target, determine whether target can be formed by 
+deleting characters from source without re‑ordering the remaining letters.  If impossible, 
+return None. 
+
+Give the total count of deleted characters (duplicates counted). 
+
+Approach 1 : 
+
+def deletions_total(src: str, tgt: str): 
+    """Total characters to delete so that src → tgt, else None.""" 
+    if src is None or tgt is None: 
+        return None 
+    i = j = 0 
+    deletions = 0 
+    while i < len(src) and j < len(tgt): 
+        if src[i] == tgt[j]: 
+            j += 1            # keep char 
+        else: 
+            deletions += 1     # delete char 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+        i += 1 
+    deletions += len(src) - i  # tail deletions 
+    return deletions if j == len(tgt) else None 
+
+Test Cases: 
+
+assert deletions_total("fiction", "fin") == 4 
+assert deletions_total("balloon", "ban") == 4      # l,l,o,o 
+assert deletions_total("abc", "abc") == 0 
+assert deletions_total("abc", "") == 3 
+assert deletions_total("abc", "abcd") is None 
+assert deletions_total("abc", "cba") is None 
+assert deletions_total("", "a") is None 
+assert deletions_total(None, "a") is None 
+
+Approach 2 : 
+
+def deletions_distinct(src: str, tgt: str): 
+    """Distinct letters to delete so that src → tgt, else None.""" 
+    if src is None or tgt is None: 
+        return None 
+    i = j = 0 
+    removed = set() 
+    while i < len(src) and j < len(tgt): 
+        if src[i] == tgt[j]: 
+            j += 1 
+        else: 
+            removed.add(src[i]) 
+        i += 1 
+    if j != len(tgt): 
+        return None 
+    removed.update(src[i:])      # remaining chars are deletions 
+    return len(removed) 
+
+Test Cases: 
+
+assert deletions_total("fiction", "fin") == 3 
+assert deletions_distinct("abc", "abc") == 0 
+assert deletions_distinct("balloon", "ban") == 2    # l,o 
+assert deletions_distinct("abc", "") == 3 
+assert deletions_distinct("abc", "abcd") is None 
+assert deletions_distinct("abc", "cba") is None 
+assert deletions_distinct("", "a") is None 
+assert deletions_distinct("abc", None) is None 
+
+ 
+ 
+ 
+ 
+ 
+ 
+Change log: 
+4/2/2024 :  
+
+●  Added different approaches and possible test cases to SET 2 Python Questions 
+●  Added different approaches to SET 3 SQL questions 3. Added a new python for SET 3 
+
+6/17/2025 
+
+●  Added Set 4 to the document 
+
+6/26/2025 
+
+●  Added Set 4 4th SQL Questions (Not 100% sure about the question though) 
+
+6/29/2025 
+
+●  Added Set 4 4th Python Questions (Not 100% sure about the question though) 
+
+ 
+
